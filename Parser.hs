@@ -19,7 +19,7 @@ parseInterval s = ((h1, m1), (h2, m2)) where
 tagsToStringList :: [Tag] -> [String]
 tagsToStringList (TagClose "TR" : xs) = []
 tagsToStringList [] = []
-tagsToStringList (TagOpen "TD" [] : TagText txt : TagClose "TD" : xs) = txt : tagsToStringList xs
+tagsToStringList (TagOpen "TD" _ : TagText txt : TagClose "TD" : xs) = txt : tagsToStringList xs
 tagsToStringList (_:xs) = tagsToStringList xs
 
 data Class = Class {crn :: Integer,
