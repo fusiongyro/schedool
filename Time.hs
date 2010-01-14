@@ -28,4 +28,6 @@ stop :: Interval -> Time
 stop (_, s, _) = s
 
 overlaps :: Interval -> Interval -> Bool
-overlaps = undefined
+overlaps (s1, t1, d1) (s2, t2, d2) | d1 == d2 = s2 < t1 && s1 < t2
+                                   | otherwise = False
+
