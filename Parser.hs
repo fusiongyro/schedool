@@ -1,6 +1,7 @@
 module Parser where
 
 import Data.Maybe
+import Data.List
 import Text.HTML.TagSoup
 import Text.Regex.Posix
 import Time
@@ -11,10 +12,6 @@ parseWeekday = catMaybes . map charToWeekday
 parseInterval :: String -> (Time, Time)
 parseInterval s = ((h1, m1), (h2, m2)) where
     [h1, m1, h2, m2] = map read $ s =~ "([0-9][0-9])"
-
--- tags >>= return . parseClass . handle . partitions (~== "<TR>")
-
---[TagOpen "TR" [],TagText "\n",TagOpen "TD" [],TagText "31941",TagClose "TD",TagText "\n",TagOpen "TD" [],TagText "CSE 113-01",TagClose "TD",TagText "\n",TagOpen "TD" [("align","center")],TagText "M",TagClose "TD",TagText "\n",TagOpen "TD" [("align","center")],TagText " M W F ",TagClose "TD",TagText "\n",TagOpen "TD" [],TagText "1300-1350",TagClose "TD",TagText "\n",TagOpen "TD" [],TagText "CRAMER 203",TagClose "TD",TagText "\n",TagOpen "TD" [("align","center")],TagText "4",TagClose "TD",TagText "\n",TagOpen "TD" [],TagText "Intro Computer Sci & Program",TagClose "TD",TagText "\n",TagOpen "TD" [],TagText " ",TagClose "TD",TagText "\n",TagOpen "TD" [("align","right")],TagText "37",TagClose "TD",TagText "\n",TagOpen "TD" [("align","right")],TagText "55",TagClose "TD",TagText "\n",TagOpen "TD" [("align","right")],TagText "18",TagClose "TD",TagText "\n",TagClose "TR",TagText "\n"],[TagOpen "TR" [],TagText "\n",TagOpen "TD" [],TagText "\n",TagOpen "TD" [],TagText "\n",TagOpen "TD" [],TagText "\n",TagOpen "TD" [("align","center")],TagText "       ",TagClose "TD",TagText "\n",TagOpen "TD" [],TagText "\n",TagOpen "TD" [],TagText " ",TagClose "TD",TagText "\n",TagOpen "TD" [],TagText "\n",TagOpen "TD" [],TagText "\n",TagOpen "TD" [],TagText " ",TagClose "TD",TagText "\n",TagOpen "TD" [],TagText "\n",TagOpen "TD" [],TagText "\n",TagOpen "TD" [],TagText "\n",TagClose "TR",TagText "\n"]
 
 tagsToStringList :: [Tag] -> [String]
 tagsToStringList (TagClose "TR" : xs) = []
@@ -70,3 +67,25 @@ readClasses file = do
 -- -}
 --  return concat $ catMaybes $ map parseClass $ tagsToStringList tags
 --  return catMaybes $ concatMap (parseClass . tagsToStringList) parts
+
+classesToCSV :: [Class] -> String
+classesToCSV = concatMap classToCSV
+    where
+      classToCSV (Class crn
+                      course
+                      campus
+                      days
+                      start
+                      stop
+                      location
+                      creditHours
+                      classTitle
+                      instructor
+                      seats
+                      limit
+                      enrolled) = (intercalate "," simpleStrings) ++ "\n"
+          where
+            simpleStrings :: [String]
+            simpleStrings = [show crn, course, campus, daysToCSV days, timeToString start, timeToString stop, location, show creditHours, classTitle, fromMaybe "" instructor, maybe "" show seats, maybe "" show limit, maybe "" show enrolled]
+            daysToCSV = intercalate "," . map show
+            timeToString (h,m) = show h ++ ":" ++ show m
