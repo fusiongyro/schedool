@@ -9,15 +9,35 @@ import Time
 parseWeekday :: String -> [Weekday]
 parseWeekday = catMaybes . map charToWeekday
 
-parseInterval :: String -> (Time, Time)
-parseInterval s = ((h1, m1), (h2, m2)) where
-    [h1, m1, h2, m2] = map read $ s =~ "([0-9][0-9])"
+parseInterval :: String -> Maybe (Time, Time)
+parseInterval s = case (map read (s =~ "([0-9][0-9])")) of
+                    [h1, m1, h2, m2] -> Just ((h1, m1), (h2, m2))
+                    _                -> Nothing
 
 tagsToStringList :: [Tag] -> [String]
 tagsToStringList (TagClose "TR" : xs) = []
 tagsToStringList [] = []
 tagsToStringList (TagOpen "TD" _ : TagText txt : TagClose "TD" : xs) = txt : tagsToStringList xs
 tagsToStringList (_:xs) = tagsToStringList xs
+
+data ClassInfo    { crn         :: Integer,
+                    course      :: String,
+                    credits     :: Integer }
+
+data LocationInfo { campus      :: String,
+                    location    :: String,
+                    limit       :: Maybe Integer }
+
+data ScheduleInfo { days        :: [Weekday],
+                    start       :: Time,
+                    stop        :: Time }
+
+data Section      { sectionOf   :: ClassInfo,
+                    location    :: LocationInfo,
+                    schedule    :: ScheduleInfo,
+                    instructor  :: String,
+                    enrolled    :: Integer }
+
 
 data Class = Class {crn :: Integer,
                     course :: String,
@@ -34,26 +54,28 @@ data Class = Class {crn :: Integer,
                     enrolled :: Maybe Integer }
            deriving (Show, Eq)
 
-
 parseClass :: [String] -> Maybe Class
-parseClass (crn : course : campus : weekdays : startStop : location : creditHours : title : rest) =
-    Just $ improveClass (Class (read crn)
-                      course
-                      campus
-                      (parseWeekday weekdays)
-                      start
-                      stop
-                      location
-                      (read creditHours)
-                      title
-                      Nothing Nothing Nothing Nothing) rest
-        where
-          (start, stop) = parseInterval startStop
-          improveClass c [] = c
-          improveClass c [i] = c { instructor = Just i }
-          improveClass c [i, s] = c { instructor = Just i, seats = Just (read s) }
-          improveClass c [i, s, l] = c { instructor = Just i, seats = Just (read s), limit = Just (read l) }
-          improveClass c [i, s, l, e] = c { instructor = Just i, seats = Just (read s), limit = Just (read l), enrolled = Just (read e)}
+parseClass (_:_:_:_:sS:_) as l =
+    case parseInterval sS of
+      Nothing        -> Nothing
+      Just startStop -> parseClass' startStop l
+          where
+            parseClass' (start, stop) (crn : course : campus : weekdays : _ : location : creditHours : title : rest) =
+                Just $ improveClass (Class (read crn)
+                                         course
+                                         campus
+                                         (parseWeekday weekdays)
+                                         start
+                                         stop
+                                         location
+                                         (read creditHours)
+                                         title
+                                         Nothing Nothing Nothing Nothing) rest
+            improveClass c [] = c
+            improveClass c [i] = c { instructor = Just i }
+            improveClass c [i, s] = c { instructor = Just i, seats = Just (read s) }
+            improveClass c [i, s, l] = c { instructor = Just i, seats = Just (read s), limit = Just (read l) }
+            improveClass c [i, s, l, e] = c { instructor = Just i, seats = Just (read s), limit = Just (read l), enrolled = Just (read e)}
 parseClass _ = Nothing
 
 parseClasses :: String -> [Class]
