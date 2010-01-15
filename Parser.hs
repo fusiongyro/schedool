@@ -56,14 +56,19 @@ parseClass (crn : course : campus : weekdays : startStop : location : creditHour
           improveClass c [i, s, l, e] = c { instructor = Just i, seats = Just (read s), limit = Just (read l), enrolled = Just (read e)}
 parseClass _ = Nothing
 
+parseClasses :: String -> [Class]
+parseClasses c = rowsToClasses $ breakRows $ parseTags c
+
+breakRows :: [Tag] -> [[Tag]]
+breakRows = partitions (~== "<TR>")
+
+rowsToClasses :: [[Tag]] -> [Class]
+rowsToClasses tags = catMaybes $ map (parseClass . tagsToStringList) tags
+
 -- {-
 readClasses :: FilePath -> IO [Class]
-readClasses file = do
-  content <- readFile file
-  let tags = parseTags content
-  let parts = partitions (~== "<TR>") tags
-  let maybeClasses = map (parseClass . tagsToStringList) parts
-  return $ catMaybes maybeClasses
+readClasses file = readFile file >>= return . parseClasses
+
 -- -}
 --  return concat $ catMaybes $ map parseClass $ tagsToStringList tags
 --  return catMaybes $ concatMap (parseClass . tagsToStringList) parts
