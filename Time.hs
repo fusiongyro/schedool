@@ -10,7 +10,7 @@ data Weekday  = Monday
               | Friday
               | Saturday
               | Sunday
-                deriving (Show, Eq, Ord)
+                deriving (Show, Eq, Ord, Read)
 
 charToWeekday :: Char -> Maybe Weekday
 charToWeekday 'M' = Just Monday

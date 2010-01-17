@@ -1,100 +1,89 @@
 module Parser where
 
+import Class
+
+import Array
+import Control.Exception
+import Control.Monad
 import Data.Maybe
 import Data.List
 import Text.HTML.TagSoup
 import Text.Regex.Posix
 import Time
 
-parseWeekday :: String -> [Weekday]
-parseWeekday = catMaybes . map charToWeekday
+(!?) :: (Ix ix) => Array ix v -> ix -> Maybe v
+arr !? i = if i > min && i < max then Just (arr ! i) else Nothing
+    where
+      (min, max) = bounds arr
+
+parseWeekdays :: String -> [Weekday]
+parseWeekdays = catMaybes . map charToWeekday
 
 parseInterval :: String -> Maybe (Time, Time)
 parseInterval s = case (map read (s =~ "([0-9][0-9])")) of
                     [h1, m1, h2, m2] -> Just ((h1, m1), (h2, m2))
                     _                -> Nothing
 
-tagsToStringList :: [Tag] -> [String]
-tagsToStringList (TagClose "TR" : xs) = []
-tagsToStringList [] = []
-tagsToStringList (TagOpen "TD" _ : TagText txt : TagClose "TD" : xs) = txt : tagsToStringList xs
-tagsToStringList (_:xs) = tagsToStringList xs
+strip :: String -> String
+strip = unwords . words
 
-data ClassInfo    { crn         :: Integer,
-                    course      :: String,
-                    credits     :: Integer }
+rowToArray :: [Tag] -> Array Int String
+rowToArray tags = listArray (0, length l - 1) l
+    where
+      l = rowToArray' tags
+      rowToArray' :: [Tag] -> [String]
+      rowToArray' (TagClose "TR" : xs) = []
+      rowToArray' [] = []
+      rowToArray' (TagOpen "TD" _ : TagText txt : TagClose "TD" : xs) = strip txt : rowToArray' xs
+      rowToArray' (_:xs) = rowToArray' xs
 
-data LocationInfo { campus      :: String,
-                    location    :: String,
-                    limit       :: Maybe Integer }
-
-data ScheduleInfo { days        :: [Weekday],
-                    start       :: Time,
-                    stop        :: Time }
-
-data Section      { sectionOf   :: ClassInfo,
-                    location    :: LocationInfo,
-                    schedule    :: ScheduleInfo,
-                    instructor  :: String,
-                    enrolled    :: Integer }
-
-
-data Class = Class {crn :: Integer,
-                    course :: String,
-                    campus :: String,
-                    days :: [Weekday],
-                    start :: Time,
-                    stop :: Time,
-                    location :: String,
-                    creditHours :: Integer,
-                    classTitle :: String,
-                    instructor :: Maybe String,
-                    seats :: Maybe Integer,
-                    limit :: Maybe Integer,
-                    enrolled :: Maybe Integer }
-           deriving (Show, Eq)
-
-parseClass :: [String] -> Maybe Class
-parseClass (_:_:_:_:sS:_) as l =
-    case parseInterval sS of
-      Nothing        -> Nothing
-      Just startStop -> parseClass' startStop l
-          where
-            parseClass' (start, stop) (crn : course : campus : weekdays : _ : location : creditHours : title : rest) =
-                Just $ improveClass (Class (read crn)
-                                         course
-                                         campus
-                                         (parseWeekday weekdays)
-                                         start
-                                         stop
-                                         location
-                                         (read creditHours)
-                                         title
-                                         Nothing Nothing Nothing Nothing) rest
-            improveClass c [] = c
-            improveClass c [i] = c { instructor = Just i }
-            improveClass c [i, s] = c { instructor = Just i, seats = Just (read s) }
-            improveClass c [i, s, l] = c { instructor = Just i, seats = Just (read s), limit = Just (read l) }
-            improveClass c [i, s, l, e] = c { instructor = Just i, seats = Just (read s), limit = Just (read l), enrolled = Just (read e)}
-parseClass _ = Nothing
-
-parseClasses :: String -> [Class]
-parseClasses c = rowsToClasses $ breakRows $ parseTags c
+readClassFile :: FilePath -> IO [Tag]
+readClassFile classfile = readFile classfile >>= return . parseTags
 
 breakRows :: [Tag] -> [[Tag]]
 breakRows = partitions (~== "<TR>")
 
-rowsToClasses :: [[Tag]] -> [Class]
-rowsToClasses tags = catMaybes $ map (parseClass . tagsToStringList) tags
+parseClassInfo :: Array Int String -> Maybe ClassInfo
+parseClassInfo a = Just (ClassInfo crn course credits)
+    where
+      crn = read $ a ! 0
+      course = a ! 1
+      credits = read $ a ! 6
 
--- {-
-readClasses :: FilePath -> IO [Class]
-readClasses file = readFile file >>= return . parseClasses
+parseLocationInfo :: Array Int String -> Maybe LocationInfo
+parseLocationInfo a = Just (LocationInfo campus room limit)
+    where
+      campus = a ! 2
+      room =  a ! 5
+      limit = a !? 10 >>= readInteger
 
--- -}
+parseScheduleInfo :: Array Int String -> Maybe ScheduleInfo
+parseScheduleInfo a = case parseInterval (a ! 4) of
+                        Just (start, stop) -> Just (ScheduleInfo (parseWeekdays (a ! 3)) start stop)
+                        Nothing -> Nothing
+
+parseSection  :: Array Int String -> Maybe Section
+parseSection a = do
+  ci <- parseClassInfo a
+  li <- parseLocationInfo a
+  si <- parseScheduleInfo a
+  let instructor = a !? 8 >>= (\x -> if x == "" then Nothing else Just x)
+      enrolled = a !? 9 >>= readInteger
+  return (Section ci li si instructor enrolled)
+
+readInteger :: String -> Maybe Integer
+readInteger x = case x =~ "^[0-9]+$" of
+                 [s] -> Just $ read s
+                 _ -> Nothing
+                 
+-- testing crap
+row :: IO [Tag]
+row = readClassFile "cs.html" >>= return . head . drop 2 . breakRows
+
 --  return concat $ catMaybes $ map parseClass $ tagsToStringList tags
 --  return catMaybes $ concatMap (parseClass . tagsToStringList) parts
 
+{-
 classesToCSV :: [Class] -> String
 classesToCSV = concatMap classToCSV
     where
@@ -116,3 +105,4 @@ classesToCSV = concatMap classToCSV
             simpleStrings = [show crn, course, campus, daysToCSV days, timeToString start, timeToString stop, location, show creditHours, classTitle, fromMaybe "" instructor, maybe "" show seats, maybe "" show limit, maybe "" show enrolled]
             daysToCSV = intercalate "," . map show
             timeToString (h,m) = show h ++ ":" ++ show m
+-}
