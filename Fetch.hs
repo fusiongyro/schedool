@@ -22,10 +22,9 @@ data Department = Dept Name Code
 strNormal :: String -> String
 strNormal = unwords . words
 
-parseDepts (TagOpen "SELECT" _ : xs) = parseDepts xs
-parseDepts (TagOpen "OPTION" [("value", code)] :
-            TagText name :
-            TagClose "OPTION" : xs) = (Dept (strNormal name) code) : parseDepts xs
+parseDepts ((TagOpen "SELECT" _) : xs) = parseDepts xs
+parseDepts (TagOpen "OPTION" [("VALUE", code)] :
+            TagText name : xs) = (Dept (strNormal name) code) : parseDepts xs
 parseDepts (TagClose "SELECT" : xs) = []
 parseDepts (x : xs) = parseDepts xs
 parseDepts [] = []
@@ -38,6 +37,7 @@ fetchDepartments :: IO [Department]
 fetchDepartments = do
   resp <- simpleHTTP $ getRequest departmentsUri
   body <- getResponseBody resp
+  -- writeFile "courses.html" body
   return $ parseDepartments body
 
 getDepartments :: IO [Department]
@@ -46,7 +46,7 @@ getDepartments = do
   return $ parseDepartments html
 
 parseDepartments :: String -> [Department]
-parseDepartments = parseDepts . head . sections (~== "<SELECT name=p_subj>") . parseTags
+parseDepartments = parseDepts . head . sections (~== "<SELECT NAME=p_subj>") . parseTags
 
 courseUri :: String
 courseUri = "https://banweb7.nmt.edu/pls/PROD/hwzkcrof.P_UncgSrchCrsOff"
@@ -58,6 +58,7 @@ makeRequest (Dept _ code) =
 
 deptToFilename :: Department -> String
 deptToFilename (Dept name _) = "cache/" ++ (map toLower name) ++ ".html"
+
 
 loadDepartment :: Department -> IO [Section]
 loadDepartment dept@(Dept name code) = do
@@ -72,8 +73,18 @@ loadDepartment dept@(Dept name code) = do
   -- return the content
   return $ parseSections content
 
-fetchAllClasses :: IO [Section]
-fetchAllClasses = do
-  depts <- getDepartments
-  classes <- mapM loadDepartment depts
-  return $ concat classes
+preserveDepartments :: [Department] -> IO ()
+preserveDepartments depts = writeFile "departments.hs" $ show depts
+
+preserveSections :: [Section] -> IO ()
+preserveSections sections = writeFile "sections.hs" $ show sections
+
+fetchEverything :: IO ([Department], [Section])
+fetchEverything = do
+  putStr "Fetching departments..."
+  depts <- fetchDepartments
+  putStrLn "done"
+  preserveDepartments depts
+  sections <- mapM loadDepartment depts >>= return . concat
+  preserveSections sections
+  return (depts, sections)
