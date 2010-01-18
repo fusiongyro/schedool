@@ -24,6 +24,11 @@ parseInterval s = case (map read (s =~ "([0-9][0-9])")) of
                     [h1, m1, h2, m2] -> Just ((h1, m1), (h2, m2))
                     _                -> Nothing
 
+readInteger :: String -> Maybe Integer
+readInteger x = case x =~ "^[0-9]+$" of
+                 [s] -> Just $ read s
+                 _ -> Nothing
+
 strip :: String -> String
 strip = unwords . words
 
@@ -36,9 +41,6 @@ rowToArray tags = listArray (0, length l - 1) l
       rowToArray' [] = []
       rowToArray' (TagOpen "TD" _ : TagText txt : TagClose "TD" : xs) = strip txt : rowToArray' xs
       rowToArray' (_:xs) = rowToArray' xs
-
-readClassFile :: FilePath -> IO [Tag]
-readClassFile classfile = readFile classfile >>= return . parseTags
 
 breakRows :: [Tag] -> [[Tag]]
 breakRows = partitions (~== "<TR>")
@@ -64,6 +66,8 @@ parseScheduleInfo a = case parseInterval (a ! 4) of
 
 parseSection  :: Array Int String -> Maybe Section
 parseSection a = do
+  let (_, max) = bounds a
+  guard (max >= 6)
   ci <- parseClassInfo a
   li <- parseLocationInfo a
   si <- parseScheduleInfo a
@@ -71,17 +75,18 @@ parseSection a = do
       enrolled = a !? 9 >>= readInteger
   return (Section ci li si instructor enrolled)
 
-readInteger :: String -> Maybe Integer
-readInteger x = case x =~ "^[0-9]+$" of
-                 [s] -> Just $ read s
-                 _ -> Nothing
-                 
--- testing crap
-row :: IO [Tag]
-row = readClassFile "cs.html" >>= return . head . drop 2 . breakRows
+parseRow :: [Tag] -> Maybe Section
+parseRow = parseSection . rowToArray
 
---  return concat $ catMaybes $ map parseClass $ tagsToStringList tags
---  return catMaybes $ concatMap (parseClass . tagsToStringList) parts
+parseSections :: String -> [Section]
+parseSections s = catMaybes $ map parseRow $ breakRows $ parseTags s
+
+readSections :: FilePath -> IO [Section]
+readSections f = readFile f >>= return . parseSections
+
+-- testing crap
+rowN :: Int -> IO [Tag]
+rowN n = readFile "cs.html" >>= return . head . drop n . breakRows . parseTags
 
 {-
 classesToCSV :: [Class] -> String
