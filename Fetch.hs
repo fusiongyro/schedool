@@ -1,7 +1,8 @@
-module Fetch where
+module Fetch (fetchEverything)
+    where
 
-import Parser
-import Class
+import Parse
+import Section
 
 import Data.Char
 import Data.Maybe
@@ -11,13 +12,6 @@ import Network.HTTP
 import Network.URI
 
 import Text.HTML.TagSoup
-
-
-type Name = String
-type Code = String
-
-data Department = Dept Name Code
-                deriving (Show, Eq, Read)
 
 strNormal :: String -> String
 strNormal = unwords . words

@@ -1,6 +1,7 @@
-module Parser where
+module Parse -- (parseSections, readSections)
+    where
 
-import Class
+import Section
 
 import Array
 import Control.Exception
@@ -45,8 +46,13 @@ rowToArray tags = listArray (0, length l - 1) l
 breakRows :: [Tag] -> [[Tag]]
 breakRows = partitions (~== "<TR>")
 
-parseClassInfo :: Array Int String -> Maybe ClassInfo
-parseClassInfo a = Just (ClassInfo crn course credits)
+parseCourseInfo :: Array Int String -> Maybe (Department, String, Integer)
+parseCourseInfo a = case (a ! 1) =~ "([^ ]+) ([0-9]+)-([0-9]+)" of
+			 [dept1, course, sect1] -> Just (read dept1, course, read sect1)
+			 _ -> Nothing
+
+parseClassInfo :: Array Int String -> (Department, String, Integer) -> Maybe ClassInfo
+parseClassInfo a (dept, course, sect) = Just (ClassInfo crn dept course sect credits)
     where
       crn = read $ a ! 0
       course = a ! 1
@@ -64,11 +70,13 @@ parseScheduleInfo a = case parseInterval (a ! 4) of
                         Just (start, stop) -> Just (ScheduleInfo (parseWeekdays (a ! 3)) start stop)
                         Nothing -> Nothing
 
+-- I still do not like this function, but this is much better
 parseSection  :: Array Int String -> Maybe Section
 parseSection a = do
   let (_, max) = bounds a
   guard (max >= 6)
-  ci <- parseClassInfo a
+  coi <- parseCourseInfo a
+  ci <- parseClassInfo a coi
   li <- parseLocationInfo a
   si <- parseScheduleInfo a
   let instructor = a !? 8 >>= (\x -> if x == "" then Nothing else Just x)
@@ -87,27 +95,3 @@ readSections f = readFile f >>= return . parseSections
 -- testing crap
 rowN :: Int -> IO [Tag]
 rowN n = readFile "cs.html" >>= return . head . drop n . breakRows . parseTags
-
-{-
-classesToCSV :: [Class] -> String
-classesToCSV = concatMap classToCSV
-    where
-      classToCSV (Class crn
-                      course
-                      campus
-                      days
-                      start
-                      stop
-                      location
-                      creditHours
-                      classTitle
-                      instructor
-                      seats
-                      limit
-                      enrolled) = (intercalate "," simpleStrings) ++ "\n"
-          where
-            simpleStrings :: [String]
-            simpleStrings = [show crn, course, campus, daysToCSV days, timeToString start, timeToString stop, location, show creditHours, classTitle, fromMaybe "" instructor, maybe "" show seats, maybe "" show limit, maybe "" show enrolled]
-            daysToCSV = intercalate "," . map show
-            timeToString (h,m) = show h ++ ":" ++ show m
--}

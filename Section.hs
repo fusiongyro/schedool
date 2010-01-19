@@ -1,15 +1,17 @@
-module Class where
+module Section where
 
 import Time
 
 data ClassInfo = ClassInfo { crn         :: Integer,
+			     department  :: Department,
                              course      :: String,
+			     section     :: Integer,
                              credits     :: Integer }
                  deriving (Show, Eq, Read)
 
-data LocationInfo = LocationInfo { campus      :: String,
+data LocationInfo = LocationInfo { campus  :: String,
                                    room    :: String,
-                                   limit       :: Maybe Integer }
+                                   limit   :: Maybe Integer }
                     deriving (Show, Eq, Read)
 
 data ScheduleInfo = ScheduleInfo { days        :: [Weekday],
@@ -24,20 +26,8 @@ data Section = Section { sectionOf   :: ClassInfo,
                          enrolled    :: Maybe Integer }
                deriving (Show, Eq, Read)
 
-{-
-data Class = Class {crn :: Integer,
-                    course :: String,
-                    campus :: String,
-                    days :: [Weekday],
-                    start :: Time,
-                    stop :: Time,
-                    location :: String,
-                    creditHours :: Integer,
-                    classTitle :: String,
-                    instructor :: Maybe String,
-                    seats :: Maybe Integer,
-                    limit :: Maybe Integer,
-                    enrolled :: Maybe Integer }
-           deriving (Show, Eq)
+type Name = String
+type Code = String
 
--}
+data Department = Dept Name Code
+                  deriving (Show, Eq, Read)
