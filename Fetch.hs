@@ -4,6 +4,7 @@ module Fetch (fetchEverything)
 import Parse
 import Section
 
+import Directory
 import Data.Char
 import Data.Maybe
 
@@ -48,6 +49,7 @@ courseUri = "https://banweb7.nmt.edu/pls/PROD/hwzkcrof.P_UncgSrchCrsOff"
 makeRequest :: Department -> Request_String
 makeRequest (Dept _ code) =
     formToRequest $ Form POST (fromJust $ parseURI courseUri)
+    -- FIXME: bad hardcoded constant! look this up in the submitted form
                       [("p_term", "201030"), ("p_subj", code)]
 
 deptToFilename :: Department -> String
@@ -72,6 +74,14 @@ preserveDepartments depts = writeFile "departments.hs" $ show depts
 
 preserveSections :: [Section] -> IO ()
 preserveSections sections = writeFile "sections.hs" $ show sections
+
+reloadEverything :: IO ([Department], [Section])
+reloadEverything = do
+  depts <- fetchDepartments
+  files <- getDirectoryContents "cache" >>= return . drop 2
+  sections <- mapM readSections (map ("cache/"++) files) >>= return . concat
+  preserveSections sections
+  return (depts, sections)
 
 fetchEverything :: IO ([Department], [Section])
 fetchEverything = do

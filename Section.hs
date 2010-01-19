@@ -3,7 +3,7 @@ module Section where
 import Time
 
 data ClassInfo = ClassInfo { crn         :: Integer,
-			     department  :: Department,
+			     department  :: String,
                              course      :: String,
 			     section     :: Integer,
                              credits     :: Integer }

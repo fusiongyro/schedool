@@ -46,16 +46,15 @@ rowToArray tags = listArray (0, length l - 1) l
 breakRows :: [Tag] -> [[Tag]]
 breakRows = partitions (~== "<TR>")
 
-parseCourseInfo :: Array Int String -> Maybe (Department, String, Integer)
-parseCourseInfo a = case (a ! 1) =~ "([^ ]+) ([0-9]+)-([0-9]+)" of
-			 [dept1, course, sect1] -> Just (read dept1, course, read sect1)
+parseCourseInfo :: Array Int String -> Maybe (String, String, Integer)
+parseCourseInfo a = case (a ! 1) =~ "([^ ]+) ([0-9]+)-([0-9]+)" :: (String, String, String, [String]) of
+			 (_, _, _, [dept, course, sect1]) -> Just (dept, course, read sect1)
 			 _ -> Nothing
 
-parseClassInfo :: Array Int String -> (Department, String, Integer) -> Maybe ClassInfo
+parseClassInfo :: Array Int String -> (String, String, Integer) -> Maybe ClassInfo
 parseClassInfo a (dept, course, sect) = Just (ClassInfo crn dept course sect credits)
     where
       crn = read $ a ! 0
-      course = a ! 1
       credits = read $ a ! 6
 
 parseLocationInfo :: Array Int String -> Maybe LocationInfo
