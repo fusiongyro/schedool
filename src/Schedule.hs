@@ -6,6 +6,8 @@ import Fetch
 
 import Control.Monad
 
+type Schedule = [Section]
+
 main = do
   (_, sects) <- reloadCached
   let overlappingStuff = [(l,r, l `overlaps` r) | (l,r) <- combinations sects]
