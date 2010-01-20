@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeSynonymInstances #-}
+
 module Time where
 
 type Hour   = Integer -- [0..23]
@@ -23,7 +25,7 @@ charToWeekday 'U' = Just Sunday
 charToWeekday _   = Nothing
 
 type Time     = (Hour, Minute)
-type Interval = (Time, Time, Weekday) 
+type Interval = (Time, Time, Weekday)
 
 hour :: Time -> Hour
 hour (h, _) = h
@@ -37,8 +39,17 @@ start (s, _, _) = s
 stop :: Interval -> Time
 stop (_, s, _) = s
 
--- I halfway wonder if this should be a typeclass instead of a function
-overlaps :: Interval -> Interval -> Bool
-overlaps (s1, t1, d1) (s2, t2, d2) | d1 == d2   = s2 < t1 && s1 < t2
-                                   | otherwise  = False
+class Overlappable a where
+  overlaps :: a -> a -> Bool
 
+instance Overlappable Interval where
+  -- I halfway wonder if this should be a typeclass instead of a function
+  -- overlaps :: Interval -> Interval -> Bool
+  overlaps (s1, t1, d1) (s2, t2, d2) | d1 == d2    = s2 < t1 && s1 < t2
+                                     | otherwise  = False
+
+toInterval :: (Time, Time, Weekday) -> Interval
+toInterval = id
+
+instance (Overlappable a) => Overlappable [a] where
+  overlaps left right = or [l `overlaps` r | l <- left, r <- right ]

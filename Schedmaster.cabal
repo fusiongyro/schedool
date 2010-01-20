@@ -1,0 +1,16 @@
+Name: Schedmaster
+Version: 0.0.0
+Cabal-Version: >=1.2
+Build-Type: Simple
+License: BSD3
+License-File: LICENSE.txt
+Copyright:
+Maintainer:
+Synopsis: A tool for downloading and creating non-conflicting class schedules.
+Author: Daniel Lyons
+
+Executable fetch
+  Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
+                 regex-posix -any, tagsoup -any
+  Main-Is: Main.hs
+  Hs-Source-Dirs: src

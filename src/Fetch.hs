@@ -15,7 +15,7 @@ import Network.URI
 import Text.HTML.TagSoup
 
 strNormal :: String -> String
-strNormal = unwords . words
+strNormal = unwords  .  words
 
 parseDepts ((TagOpen "SELECT" _) : xs) = parseDepts xs
 parseDepts (TagOpen "OPTION" [("VALUE", code)] :
@@ -77,8 +77,8 @@ preserveSections sections = writeFile "sections.hs" $ show sections
 
 reloadEverything :: IO ([Department], [Section])
 reloadEverything = do
-  depts <- fetchDepartments
-  files <- getDirectoryContents "cache" >>= return . drop 2
+  depts    <- fetchDepartments
+  files    <- getDirectoryContents "cache" >>= return . drop 2
   sections <- mapM readSections (map ("cache/"++) files) >>= return . concat
   preserveSections sections
   return (depts, sections)
