@@ -12,6 +12,14 @@ Author: Daniel Lyons
 Executable fetch
   Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
                  regex-posix -any, tagsoup -any
-  Main-Is: Main.hs
+  Main-Is: Fetch.hs
   Hs-Source-Dirs: src
-  Other-Modules: Time, Section, Parse, Fetch, Main
+  Other-Modules: Time, Section, Parse, Fetch
+
+Executable findOverlaps
+  Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
+                 regex-posix -any, tagsoup -any
+  Main-Is: Schedule.hs
+  Hs-Source-Dirs: src
+  Other-Modules: Time, Section, Parse, Fetch, Schedule
+

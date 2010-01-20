@@ -1,4 +1,4 @@
-module Fetch (fetchEverything)
+module Fetch -- (fetchEverything)
     where
 
 import Parse
@@ -32,7 +32,7 @@ fetchDepartments :: IO [Department]
 fetchDepartments = do
   resp <- simpleHTTP $ getRequest departmentsUri
   body <- getResponseBody resp
-  -- writeFile "courses.html" body
+  writeFile "courses.html" body
   return $ parseDepartments body
 
 getDepartments :: IO [Department]
@@ -75,9 +75,21 @@ preserveDepartments depts = writeFile "departments.hs" $ show depts
 preserveSections :: [Section] -> IO ()
 preserveSections sections = writeFile "sections.hs" $ show sections
 
+reloadDepartments :: IO [Department]
+reloadDepartments = readFile "courses.html" >>= return . parseDepartments
+
+reloadCached :: IO ([Department], [Section])
+reloadCached = do
+  depts <- readFile "departments.hs" >>= return . read
+  sects <- readFile "sections.hs" >>= return . read
+  return (depts, sects)
+
 reloadEverything :: IO ([Department], [Section])
 reloadEverything = do
-  depts    <- fetchDepartments
+  putStrLn "reloading departments"
+  depts    <- reloadDepartments
+  preserveDepartments depts
+  putStrLn "reloading cache"
   files    <- getDirectoryContents "cache" >>= return . drop 2
   sections <- mapM readSections (map ("cache/"++) files) >>= return . concat
   preserveSections sections
@@ -92,3 +104,7 @@ fetchEverything = do
   sections <- mapM loadDepartment depts >>= return . concat
   preserveSections sections
   return (depts, sections)
+
+main = do
+  (depts, sections) <- fetchEverything
+  putStrLn $ "Fetched " ++ (show $ length $ depts) ++ " departments and " ++ (show $ length $ sections) ++ " total sections."
