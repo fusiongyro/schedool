@@ -14,3 +14,4 @@ Executable fetch
                  regex-posix -any, tagsoup -any
   Main-Is: Main.hs
   Hs-Source-Dirs: src
+  Other-Modules: Time, Section, Parse, Fetch, Main

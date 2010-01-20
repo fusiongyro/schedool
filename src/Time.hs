@@ -53,3 +53,21 @@ toInterval = id
 
 instance (Overlappable a) => Overlappable [a] where
   overlaps left right = or [l `overlaps` r | l <- left, r <- right ]
+
+combinations :: [a] -> [(a, a)]
+combinations []     = []
+combinations (x:xs) = distribute x xs ++ combinations xs
+    where
+      distribute x (y:ys) = (x,y) : distribute x ys
+      distribute _ []     = []
+
+noOverlaps :: (Overlappable a) => [a] -> Bool
+noOverlaps xs = not (any (uncurry overlaps) (combinations xs))
+
+t1, t2, t3, t4, t5, t6 :: Interval
+t1 = (( 9,00), ( 9,30), Monday) --  9:00--9:30  M
+t2 = (( 9,30), (10,15), Monday) --  9:30--10:15 M
+t3 = ((10,00), (10,50), Monday) -- 10:00--10:50 M
+t4 = (( 9,00), ( 9,30), Friday) --  9:00--9:30  F
+t5 = (( 9,30), (10,15), Friday) --  9:30--10:15 F
+t6 = ((10,00), (10,50), Friday) -- 10:00--10:50 F
