@@ -59,8 +59,8 @@ type Interval = (Time, Time, Weekday)
 
 -- | Detect overlapping time intervals.
 instance Overlappable Interval where
-  (s1, t1, d1) `overlaps` (s2, t2, d2) | d1 == d2    = s2 < t1 && s1 < t2
-                                     | otherwise  = False
+  (s1, t1, d1) `overlaps` (s2, t2, d2) | d1 == d2   = s2 < t1 && s1 < t2
+                                       | otherwise  = False
 
 -- | Converts a tuple of (Time, Time, Weekday) to our Interval type.
 toInterval :: (Time, Time, Weekday) -> Interval
