@@ -1,0 +1,14 @@
+Refactoring ideas.
+
+The overall intended functions are:
+
+  mirror   -- make a local mirror of the HTML we'll be parsing
+  update   -- parse the local mirror and produce our local database
+  
+Then once you have a database you can use:
+
+  schedql  -- a query language that generates valid schedules
+  whatnow  -- suggests what courses to take based on what your
+              major is and what you've already taken
+  webschd  -- a web-based schedule editor
+
