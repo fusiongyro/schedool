@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
--- | Time and date related types and func
+-- | Time and date related types and functions.
 module Time (Hour,
              Minute,
              Weekday(..),
@@ -12,9 +12,12 @@ module Time (Hour,
 
 import Overlap
 
+-- | An hour is simply an integer.
 type Hour   = Integer -- [0..23]
+-- | A minute is also simply an integer.
 type Minute = Integer -- [0..59]
 
+-- | A simple day-of-the-week type.
 data Weekday  = Monday
               | Tuesday
               | Wednesday
@@ -24,6 +27,8 @@ data Weekday  = Monday
               | Sunday
                 deriving (Show, Eq, Ord, Read)
 
+-- | This and its opposite 'weekdayToChar' are convenient for the shorthand
+--   notation used in Banweb.
 charToWeekday :: Char -> Maybe Weekday
 charToWeekday 'M' = Just Monday
 charToWeekday 'T' = Just Tuesday
@@ -34,6 +39,8 @@ charToWeekday 'S' = Just Saturday
 charToWeekday 'U' = Just Sunday
 charToWeekday _   = Nothing
 
+-- | Opposite of 'charToWeekday': given a day, return the corresponding
+--   shorthand character.
 weekdayToChar :: Weekday -> Char
 weekdayToChar Monday    = 'M'
 weekdayToChar Tuesday   = 'T'
@@ -43,20 +50,18 @@ weekdayToChar Friday    = 'F'
 weekdayToChar Saturday  = 'S'
 weekdayToChar Sunday    = 'U'
 
+-- | A type for 4:20
 type Time     = (Hour, Minute)
+
+-- | Time intervals. Notice you cannot represent intervals spanning more
+--   than a day.
 type Interval = (Time, Time, Weekday)
 
+-- | Detect overlapping time intervals.
 instance Overlappable Interval where
   (s1, t1, d1) `overlaps` (s2, t2, d2) | d1 == d2    = s2 < t1 && s1 < t2
                                      | otherwise  = False
 
+-- | Converts a tuple of (Time, Time, Weekday) to our Interval type.
 toInterval :: (Time, Time, Weekday) -> Interval
 toInterval = id
-
-t1, t2, t3, t4, t5, t6 :: Interval
-t1 = (( 9,00), ( 9,30), Monday) --  9:00--9:30  M
-t2 = (( 9,30), (10,15), Monday) --  9:30--10:15 M
-t3 = ((10,00), (10,50), Monday) -- 10:00--10:50 M
-t4 = (( 9,00), ( 9,30), Friday) --  9:00--9:30  F
-t5 = (( 9,30), (10,15), Friday) --  9:30--10:15 F
-t6 = ((10,00), (10,50), Friday) -- 10:00--10:50 F
