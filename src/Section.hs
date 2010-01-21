@@ -1,30 +1,36 @@
 module Section where
 
+import Overlap
 import Time hiding (toInterval)
 
-data ClassInfo = ClassInfo { crn         :: Integer,
-			                 department  :: String,
-                             course      :: String,
-			                 section     :: Integer,
-                             credits     :: Integer }
-                 deriving (Show, Eq, Read)
+-- crn and section should be moved to Section
+data ClassInfo = ClassInfo {
+	department  :: String,
+    course      :: String,
+    credits     :: Integer }
+    deriving (Show, Eq, Read)
 
-data LocationInfo = LocationInfo { campus  :: String,
-                                   room    :: String,
-                                   limit   :: Maybe Integer }
-                    deriving (Show, Eq, Read)
+data LocationInfo = LocationInfo {
+    campus      :: String,
+    room        :: String,
+    limit       :: Maybe Integer }
+    deriving (Show, Eq, Read)
 
-data ScheduleInfo = ScheduleInfo { days        :: [Weekday],
-                                   start       :: Time,
-                                   stop        :: Time }
-                    deriving (Show, Eq, Read)
+data ScheduleInfo = ScheduleInfo {
+    days        :: [Weekday],
+    start       :: Time,
+    stop        :: Time }
+    deriving (Show, Eq, Read)
 
-data Section = Section { sectionOf   :: ClassInfo,
-                         location    :: LocationInfo,
-                         schedule    :: ScheduleInfo,
-                         instructor  :: Maybe String,
-                         enrolled    :: Maybe Integer }
-               deriving (Show, Eq, Read)
+data Section = Section {
+    crn         :: Integer,
+	section     :: Integer,
+    sectionOf   :: ClassInfo,
+    location    :: LocationInfo,
+    schedule    :: ScheduleInfo,
+    instructor  :: Maybe String,
+    enrolled    :: Maybe Integer }
+    deriving (Show, Eq, Read)
 
 type Name = String
 type Code = String
@@ -44,14 +50,7 @@ instance Overlappable Section where
 pshow :: Section -> String
 pshow s = showClassInfo (sectionOf s) ++ " (" ++ (showSchedInfo (schedule s)) ++ ")"
     where
-      showClassInfo (ClassInfo _ dept course sect _) = dept ++ " " ++ course ++ "-" ++ (show sect)
+      showClassInfo (ClassInfo dept course _) = dept ++ " " ++ course ++ "-" ++ (show (section s))
       showSchedInfo (ScheduleInfo days start stop)   = (showT start) ++ "-" ++ (showT stop) ++ " " ++ (weekdays days)
-      weekdays (Monday:xs)    = 'M' : weekdays xs
-      weekdays (Tuesday:xs)   = 'T' : weekdays xs
-      weekdays (Wednesday:xs) = 'W' : weekdays xs
-      weekdays (Thursday:xs)  = 'R' : weekdays xs
-      weekdays (Friday:xs)    = 'F' : weekdays xs
-      weekdays (Saturday:xs)  = 'S' : weekdays xs
-      weekdays (Sunday:xs)    = 'U' : weekdays xs
-      weekdays []             = []
+      weekdays = map weekdayToChar
       showT (hour,minute)     = (show hour) ++ ":" ++ (show minute)

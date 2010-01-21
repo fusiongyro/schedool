@@ -1,6 +1,16 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
-module Time where
+-- | Time and date related types and func
+module Time (Hour,
+             Minute,
+             Weekday(..),
+             Time,
+             Interval,
+             toInterval,
+             charToWeekday,
+             weekdayToChar) where
+
+import Overlap
 
 type Hour   = Integer -- [0..23]
 type Minute = Integer -- [0..59]
@@ -24,45 +34,24 @@ charToWeekday 'S' = Just Saturday
 charToWeekday 'U' = Just Sunday
 charToWeekday _   = Nothing
 
+weekdayToChar :: Weekday -> Char
+weekdayToChar Monday    = 'M'
+weekdayToChar Tuesday   = 'T'
+weekdayToChar Wednesday = 'W'
+weekdayToChar Thursday  = 'R'
+weekdayToChar Friday    = 'F'
+weekdayToChar Saturday  = 'S'
+weekdayToChar Sunday    = 'U'
+
 type Time     = (Hour, Minute)
 type Interval = (Time, Time, Weekday)
 
-hour :: Time -> Hour
-hour (h, _) = h
-
-minute :: Time -> Minute
-minute (_, m) = m
-
-start :: Interval -> Time
-start (s, _, _) = s
-
-stop :: Interval -> Time
-stop (_, s, _) = s
-
-class Overlappable a where
-  overlaps :: a -> a -> Bool
-
 instance Overlappable Interval where
-  -- I halfway wonder if this should be a typeclass instead of a function
-  -- overlaps :: Interval -> Interval -> Bool
   (s1, t1, d1) `overlaps` (s2, t2, d2) | d1 == d2    = s2 < t1 && s1 < t2
                                      | otherwise  = False
 
 toInterval :: (Time, Time, Weekday) -> Interval
 toInterval = id
-
-instance (Overlappable a) => Overlappable [a] where
-  overlaps left right = or [l `overlaps` r | l <- left, r <- right ]
-
-combinations :: [a] -> [(a, a)]
-combinations []     = []
-combinations (x:xs) = distribute x xs ++ combinations xs
-    where
-      distribute x (y:ys) = (x,y) : distribute x ys
-      distribute _ []     = []
-
-noOverlaps :: (Overlappable a) => [a] -> Bool
-noOverlaps xs = not (any (uncurry overlaps) (combinations xs))
 
 t1, t2, t3, t4, t5, t6 :: Interval
 t1 = (( 9,00), ( 9,30), Monday) --  9:00--9:30  M

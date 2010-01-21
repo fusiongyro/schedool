@@ -52,9 +52,8 @@ parseCourseInfo a = case (a ! 1) =~ "([^ ]+) ([0-9]+)-([0-9]+)" :: (String, Stri
 			 _ -> Nothing
 
 parseClassInfo :: Array Int String -> (String, String, Integer) -> Maybe ClassInfo
-parseClassInfo a (dept, course, sect) = Just (ClassInfo crn dept course sect credits)
+parseClassInfo a (dept, course, sect) = Just (ClassInfo dept course credits)
     where
-      crn = read $ a ! 0
       credits = read $ a ! 6
 
 parseLocationInfo :: Array Int String -> Maybe LocationInfo
@@ -74,13 +73,13 @@ parseSection  :: Array Int String -> Maybe Section
 parseSection a = do
   let (_, max) = bounds a
   guard (max >= 6)
-  coi <- parseCourseInfo a
+  coi@(_,_,section) <- parseCourseInfo a
   ci <- parseClassInfo a coi
   li <- parseLocationInfo a
   si <- parseScheduleInfo a
   let instructor = a !? 8 >>= (\x -> if x == "" then Nothing else Just x)
       enrolled = a !? 9 >>= readInteger
-  return (Section ci li si instructor enrolled)
+  return (Section (read $ a ! 0) section ci li si instructor enrolled)
 
 parseRow :: [Tag] -> Maybe Section
 parseRow = parseSection . rowToArray
