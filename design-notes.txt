@@ -12,3 +12,41 @@ Then once you have a database you can use:
               major is and what you've already taken
   webschd  -- a web-based schedule editor
 
+
+Module structure
+
+  The current Fetch and Parse modules are not a bad first try but they won't
+  do on their own. They need to be broken down into more modules.
+
+  Mirror - This is the download part of the current Fetch module. The
+           functions in here should attempt to read out of a local cache and
+           download only when the cache is empty.
+
+	   Exports:
+	     openDepartmentData :: IO String
+	     openSections       :: Department -> IO String
+
+           We can leave the part that actually hits the website internal.
+
+  CourseData -
+           This is the load part of the Fetch module. The functions in here
+           should do nothing more than find the data using Mirror and parse it
+           using Parse. This will be the rest of the application's main entry
+           point.
+
+	   Exports:
+	     getDepartments :: IO [Department]
+	     getSections    :: IO [Section]
+
+	   This module may have other exports for utilities such as
+	   SectionMap, or these may appear somewhere else.
+
+  Parse -  This module simply parses the HTML and produces lists of sections
+           or departments. The internals of this module are likely to be nasty
+           and to change radically whenever the school changes the output of
+           their Banweb server, so this part may not be verified completely.
+
+	   Exports:
+	     parseDepartments :: String -> [Department]
+	     parseSections    :: String -> [Section]
+
