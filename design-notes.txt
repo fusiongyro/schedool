@@ -18,17 +18,21 @@ Module structure
   The current Fetch and Parse modules are not a bad first try but they won't
   do on their own. They need to be broken down into more modules.
 
-  Mirror - This is the download part of the current Fetch module. The
+  Sched.Mirror - 
+           This is the download part of the current Fetch module. The
            functions in here should attempt to read out of a local cache and
            download only when the cache is empty.
 
 	   Exports:
 	     openDepartmentData :: IO String
 	     openSections       :: Department -> IO String
+             recreate           :: IO Bool
 
-           We can leave the part that actually hits the website internal.
+           We can leave the part that actually hits the website
+           internal, or we can expose the recreate method which will
+           recreate the mirror by downloading the files.
 
-  CourseData -
+  Sched.Data -
            This is the load part of the Fetch module. The functions in here
            should do nothing more than find the data using Mirror and parse it
            using Parse. This will be the rest of the application's main entry
@@ -41,7 +45,8 @@ Module structure
 	   This module may have other exports for utilities such as
 	   SectionMap, or these may appear somewhere else.
 
-  Parse -  This module simply parses the HTML and produces lists of sections
+  Sched.Parse -  
+           This module simply parses the HTML and produces lists of sections
            or departments. The internals of this module are likely to be nasty
            and to change radically whenever the school changes the output of
            their Banweb server, so this part may not be verified completely.
@@ -50,3 +55,11 @@ Module structure
 	     parseDepartments :: String -> [Department]
 	     parseSections    :: String -> [Section]
 
+  Sched.Query -
+           This module implements the scheduling query language. It
+           may need to be broken down internally into submodules for
+           parsing and generating schedules, but its public interface
+           will be very simple.
+
+	   Exports:
+	     runQuery  :: [Section] -> String -> [Section]
