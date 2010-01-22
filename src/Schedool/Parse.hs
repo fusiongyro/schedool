@@ -1,5 +1,12 @@
-module Schedool.Parse -- (parseSections, readSections)
+module Schedool.Parse (parseDepartments,
+                       parseSections)
     where
+
+parseDepartments :: String -> [Department]
+
+parseSections :: String -> [Section]
+
+
 
 import Schedool.Section
 import Schedool.Time
