@@ -1,16 +1,16 @@
-module Section (
-               ClassInfo(..),
-               LocationInfo(..),
-               ScheduleInfo(..),
-               Section(..),
-               Name,
-               Code,
-               Department(..),
-               toInterval,
-               pshow) where
+module Schedool.Section (
+                         ClassInfo(..),
+                         LocationInfo(..),
+                         ScheduleInfo(..),
+                         Section(..),
+                         Name,
+                         Code,
+                         Department(..),
+                         toInterval,
+                         pshow) where
 
-import Overlap
-import Time hiding (toInterval)
+import Schedool.Overlap
+import Schedool.Time hiding (toInterval)
 
 -- | The class you register for is actually a section, that is, an instance of
 --   a particular course being taught at a particular time and place by a

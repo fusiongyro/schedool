@@ -18,7 +18,7 @@ Module structure
   The current Fetch and Parse modules are not a bad first try but they won't
   do on their own. They need to be broken down into more modules.
 
-  Sched.Mirror - 
+  Schedool.Mirror - 
            This is the download part of the current Fetch module. The
            functions in here should attempt to read out of a local cache and
            download only when the cache is empty.
@@ -32,7 +32,7 @@ Module structure
            internal, or we can expose the recreate method which will
            recreate the mirror by downloading the files.
 
-  Sched.Data -
+  Schedool.Data -
            This is the load part of the Fetch module. The functions in here
            should do nothing more than find the data using Mirror and parse it
            using Parse. This will be the rest of the application's main entry
@@ -45,7 +45,7 @@ Module structure
 	   This module may have other exports for utilities such as
 	   SectionMap, or these may appear somewhere else.
 
-  Sched.Parse -  
+  Schedool.Parse -  
            This module simply parses the HTML and produces lists of sections
            or departments. The internals of this module are likely to be nasty
            and to change radically whenever the school changes the output of
@@ -55,7 +55,20 @@ Module structure
 	     parseDepartments :: String -> [Department]
 	     parseSections    :: String -> [Section]
 
-  Sched.Query -
+  Schedool.Cache - 
+           This module implements a simple cache of sections and
+           departments. It's intended to be used by the Data module
+           and hidden from the end user.
+
+           Exports:
+             cacheDepartments      :: [Department] -> IO ()
+             cacheSections         :: [Section]    -> IO ()
+
+             hasCache              :: IO Bool
+             readCachedDepartments :: IO [Department]
+             readCachedSections    :: IO [Section]
+
+  Schedool.Query -
            This module implements the scheduling query language. It
            may need to be broken down internally into submodules for
            parsing and generating schedules, but its public interface

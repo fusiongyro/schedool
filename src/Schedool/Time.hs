@@ -1,16 +1,16 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
 -- | Time and date related types and functions.
-module Time (Hour,
-             Minute,
-             Weekday(..),
-             Time,
-             Interval,
-             toInterval,
-             charToWeekday,
-             weekdayToChar) where
+module Schedool.Time (Hour,
+                      Minute,
+                      Weekday(..),
+                      Time,
+                      Interval,
+                      toInterval,
+                      charToWeekday,
+                      weekdayToChar) where
 
-import Overlap
+import Schedool.Overlap
 
 -- | An hour is simply an integer.
 type Hour   = Integer -- [0..23]

@@ -1,8 +1,8 @@
-module Fetch -- (fetchEverything)
+module Schedool.Fetch -- (fetchEverything)
     where
 
-import Parse
-import Section
+import Schedool.Parse
+import Schedool.Section
 
 import Directory
 import Data.Char

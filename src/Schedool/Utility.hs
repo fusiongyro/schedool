@@ -1,6 +1,6 @@
 -- | A collection of helpful combinators that don't really belong to any other
 --   part of the app.
-module Utility where
+module Schedool.Utility where
 
 -- | Returns every pairwise combination of the elements of the list.
 combinations :: [a] -> [(a, a)]

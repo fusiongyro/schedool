@@ -1,7 +1,8 @@
-module Parse -- (parseSections, readSections)
+module Schedool.Parse -- (parseSections, readSections)
     where
 
-import Section
+import Schedool.Section
+import Schedool.Time
 
 import Array
 import Control.Exception
@@ -10,7 +11,6 @@ import Data.Maybe
 import Data.List
 import Text.HTML.TagSoup
 import Text.Regex.Posix
-import Time
 
 (!?) :: (Ix ix) => Array ix v -> ix -> Maybe v
 arr !? i = if i > min && i < max then Just (arr ! i) else Nothing

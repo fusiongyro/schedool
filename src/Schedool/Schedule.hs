@@ -1,10 +1,10 @@
-module Schedule where
+module Schedool.Schedule where
 
-import Time
-import Section
-import Fetch
-import Utility
-import Overlap
+import Schedool.Time
+import Schedool.Section
+import Schedool.Fetch
+import Schedool.Utility
+import Schedool.Overlap
 
 import Control.Monad
 
