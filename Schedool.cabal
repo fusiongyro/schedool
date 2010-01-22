@@ -9,6 +9,10 @@ Maintainer:
 Synopsis: A tool for downloading and creating non-conflicting class schedules.
 Author: Daniel Lyons
 
+Library Schedool
+  Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
+                 regex-posix -any, tagsoup -any
+
 Executable fetch
   Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
                  regex-posix -any, tagsoup -any
