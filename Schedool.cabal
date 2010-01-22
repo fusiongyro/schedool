@@ -9,21 +9,9 @@ Maintainer:
 Synopsis: A tool for downloading and creating non-conflicting class schedules.
 Author: Daniel Lyons
 
-Library Schedool
+Library
   Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
                  regex-posix -any, tagsoup -any
-
-Executable fetch
-  Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
-                 regex-posix -any, tagsoup -any
-  Main-Is: Fetch.hs
+  Exposed-Modules: Schedool.Time, Schedool.Section, Schedool.Parse, 
+                   Schedool.Fetch, Schedool.Schedule
   Hs-Source-Dirs: src
-  Other-Modules: Time, Section, Parse, Fetch
-
-Executable findOverlaps
-  Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
-                 regex-posix -any, tagsoup -any
-  Main-Is: Schedule.hs
-  Hs-Source-Dirs: src
-  Other-Modules: Time, Section, Parse, Fetch, Schedule
-
