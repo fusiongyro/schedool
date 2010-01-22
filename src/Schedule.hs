@@ -3,6 +3,8 @@ module Schedule where
 import Time
 import Section
 import Fetch
+import Utility
+import Overlap
 
 import Control.Monad
 
