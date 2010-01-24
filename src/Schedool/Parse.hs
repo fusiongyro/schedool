@@ -40,17 +40,17 @@ readInteger x = case x =~ "^[0-9]+$" of
 strip :: String -> String
 strip = unwords . words
 
-rowToArray :: [Tag] -> Array Int String
+rowToArray :: [Tag String] -> Array Int String
 rowToArray tags = listArray (0, length l - 1) l
     where
       l = rowToArray' tags
-      rowToArray' :: [Tag] -> [String]
+      rowToArray' :: [Tag String] -> [String]
       rowToArray' (TagClose "TR" : xs) = []
       rowToArray' [] = []
       rowToArray' (TagOpen "TD" _ : TagText txt : TagClose "TD" : xs) = strip txt : rowToArray' xs
       rowToArray' (_:xs) = rowToArray' xs
 
-breakRows :: [Tag] -> [[Tag]]
+breakRows :: [Tag String] -> [[Tag String]]
 breakRows = partitions (~== "<TR>")
 
 parseCourseInfo :: Array Int String -> Maybe (String, String, Integer)
@@ -88,7 +88,7 @@ parseSection a = do
       enrolled = a !? 9 >>= readInteger
   return (Section (read $ a ! 0) section ci li si instructor enrolled)
 
-parseRow :: [Tag] -> Maybe Section
+parseRow :: [Tag String] -> Maybe Section
 parseRow = parseSection . rowToArray
 
 parseSections :: String -> [Section]
@@ -98,5 +98,5 @@ readSections :: FilePath -> IO [Section]
 readSections f = readFile f >>= return . parseSections
 
 -- testing crap
-rowN :: Int -> IO [Tag]
+rowN :: Int -> IO [Tag String]
 rowN n = readFile "cs.html" >>= return . head . drop n . breakRows . parseTags
