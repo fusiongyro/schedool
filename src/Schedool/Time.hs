@@ -1,14 +1,15 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 
 -- | Time and date related types and functions.
-module Schedool.Time (Hour,
-                      Minute,
-                      Weekday(..),
-                      Time,
-                      Interval,
-                      toInterval,
-                      charToWeekday,
-                      weekdayToChar) where
+module Schedool.Time (Hour
+                     ,Minute
+                     ,Weekday(..)
+                     ,Time
+                     ,Interval
+                     ,toInterval
+                     ,charToWeekday
+                     ,weekdayToChar)
+    where
 
 import Schedool.Overlap
 
