@@ -1,8 +1,9 @@
 -- | Defines a class of types that support detection of overlapping values.
-module Schedool.Overlap (Overlappable,
-                         overlaps,
-                         hasOverlaps,
-                         noOverlaps) where
+module Schedool.Overlap (Overlappable
+                        ,overlaps
+                        ,hasOverlaps
+                        ,noOverlaps)
+    where
 
 import Schedool.Utility
 

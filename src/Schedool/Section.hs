@@ -1,13 +1,14 @@
-module Schedool.Section (
-                         ClassInfo(..),
-                         LocationInfo(..),
-                         ScheduleInfo(..),
-                         Section(..),
-                         Name,
-                         Code,
-                         Department(..),
-                         toInterval,
-                         pshow) where
+module Schedool.Section (Section(..)
+                        ,ClassInfo(..)
+                        ,LocationInfo(..)
+                        ,ScheduleInfo(..)
+
+                        ,Name
+                        ,Code
+                        ,Department(..)
+                        ,toInterval
+                        ,pshow)
+    where
 
 import Schedool.Overlap
 import Schedool.Time hiding (toInterval)

@@ -1,15 +1,10 @@
-module Schedool.Parse (parseDepartments,
-                       parseSections)
+module Schedool.Parse (parseDepartments
+                       ,parseSections)
     where
-
-parseDepartments :: String -> [Department]
-
-parseSections :: String -> [Section]
-
-
 
 import Schedool.Section
 import Schedool.Time
+import Schedool.Utility (strNormal)
 
 import Array
 import Control.Exception
@@ -18,6 +13,20 @@ import Data.Maybe
 import Data.List
 import Text.HTML.TagSoup
 import Text.Regex.Posix
+
+parseDepartments :: String -> [Department]
+parseDepartments = parseDepts . head . sections (~== "<SELECT NAME=p_subj>") . parseTags
+
+parseSections :: String -> [Section]
+parseSections s = catMaybes $ map parseRow $ breakRows $ parseTags s
+
+parseDepts :: [Tag [Char]] -> [Department]
+parseDepts ((TagOpen "SELECT" _) : xs) = parseDepts xs
+parseDepts (TagOpen "OPTION" [("VALUE", code)] :
+            TagText name : xs) = (Dept (strNormal name) code) : parseDepts xs
+parseDepts (TagClose "SELECT" : xs) = []
+parseDepts (x : xs) = parseDepts xs
+parseDepts [] = []
 
 (!?) :: (Ix ix) => Array ix v -> ix -> Maybe v
 arr !? i = if i > min && i < max then Just (arr ! i) else Nothing
@@ -90,9 +99,6 @@ parseSection a = do
 
 parseRow :: [Tag String] -> Maybe Section
 parseRow = parseSection . rowToArray
-
-parseSections :: String -> [Section]
-parseSections s = catMaybes $ map parseRow $ breakRows $ parseTags s
 
 readSections :: FilePath -> IO [Section]
 readSections f = readFile f >>= return . parseSections
