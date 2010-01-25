@@ -2,29 +2,36 @@ module Schedool.Data (getDepartments
                      ,getSections) 
     where 
 
+import Schedool.Cache
 import Schedool.Mirror
 import Schedool.Parse
 import Schedool.Section
 
 import Control.Monad
 
--- local caching is no longer implemented.
+-- | The current list of departments. Uses two levels of caching.
+getDepartments :: IO [Department]
+getDepartments = tryCache "departments.hs" readDepartments
 
 -- | The current list of Departments.
-getDepartments :: IO [Department]
-getDepartments = openDepartmentData >>= return . parseDepartments
+readDepartments :: IO [Department]
+readDepartments = openDepartmentData >>= return . parseDepartments
+
+-- | The curretn list of sections. Uses two levels of caching.
+getSections :: IO [Section]
+getSections = tryCache "sections.hs" readSections
 
 -- | The current list of Sections.
-getSections :: IO [Section]
-getSections = do
+readSections :: IO [Section]
+readSections = do
   -- get all the departments
-  depts <- getDepartments
+  depts <- readDepartments
   -- get each department's sections and concatenate all of them into one big list
-  liftM concat $ forM depts getSection
+  liftM concat $ forM depts readSection
 
-getSection :: Department -> IO [Section]
-getSection dept = do
-  -- get the section HTML
+readSection :: Department -> IO [Section]
+readSection dept = do
+  -- read the section HTML
   sectionHTML <- openSectionData dept
   -- pass it off to the parser
   return $ parseSections sectionHTML
