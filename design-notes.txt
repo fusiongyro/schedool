@@ -76,3 +76,37 @@ Module structure
 
 	   Exports:
 	     runQuery  :: [Section] -> String -> [Section]
+
+
+Query language
+
+The most basic schedule is simply a single class entity:
+
+  CSE 113
+
+This query produces all schedules with this single necessary class,
+CSE 113. SchedQL supports extending schedules with Boolean algebra,
+hence the following identical formulations of a schedule with two
+classes:
+
+  CSE 113 and MATH 112
+  CSE 113, MATH 112
+
+And also the following formulations of a schedule with one of the two
+classes:
+
+  CSE 113 or MATH 112
+
+Note that this is functionally an exclusive or, because
+English-speakers expect that behavior from or. To effect inclusive or,
+use the following operator:
+
+  CSE 113 and/or MATH 112
+
+The only remaining operator is parentheses, which can be used to group
+together expressions into subexpressions:
+
+  CSE 113, MATH 112 and (ENGL 113 or PHIL 101)
+
+The "and" operation is implemented as combinations, the "or" operation
+is implemented as union, "and/or" is implemented by both.
