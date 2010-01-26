@@ -5,6 +5,7 @@ module Schedool.Query (runQuery) where
 import Schedool.Data
 import Schedool.Section
 
+import Char
 import qualified Data.Map as Map
 
 import Text.ParserCombinators.Parsec
@@ -14,8 +15,19 @@ import qualified Text.ParserCombinators.Parsec.Token as P
 import Text.ParserCombinators.Parsec.Language
 
 -- This should actually be String String, because we have classes like CS-111L
-data ClassName = Class String Integer
+data ClassName = Class String String
                  deriving (Show, Eq, Ord, Read)
+
+-- | The expression type for our language.
+data Expr = Expr `OrExp` Expr
+          | Expr `AndExp` Expr
+          | Expr `AndOrExp` Expr
+          | Value ClassName
+            deriving (Show, Eq, Read)
+
+-- | This is an internal datatype used for finding the sections rapidly based
+--   on the class name.
+type Catalog = Map.Map ClassName [Section]
 
 runQuery  :: [Section] -> String -> [[Section]]
 runQuery = undefined
@@ -25,28 +37,23 @@ lexer = P.makeTokenParser
                   , identLetter = letter
                   , reservedOpNames = ["and", ",", "or", "and/or"]})
 
-space = P.whiteSpace lexer
-ident = P.identifier lexer
-integer = P.integer lexer
+space      = P.whiteSpace lexer
+ident      = P.identifier lexer
+classnum   = many1 (digit <|> oneOf "lL")
 reservedOp = P.reservedOp lexer
-parens = P.parens lexer
+parens     = P.parens lexer
 
 -- | Parses a string of the form "CS 121" and returns the
 --   corresponding data structure: Class "CS" 121.
 parseClass :: CharParser st Expr
 parseClass = do
   dept <- ident
-  num <- integer
-  return $ Value (Class dept num)
+  num  <- classnum
+  return $ Value $ Class (upcase dept) (upcase num)
+      where
+        upcase = map Char.toUpper
 
 term = parseClass <|> (parens exprParser <?> "class")
-
--- | The expression type for our language.
-data Expr = Expr `OrExp` Expr
-          | Expr `AndExp` Expr
-          | Expr `AndOrExp` Expr
-          | Value ClassName
-            deriving (Show, Eq, Read)
 
 -- | The operator precedence expression table for our language.
 table :: OperatorTable Char st Expr
@@ -74,14 +81,7 @@ runParse s = case parse exprParser "runParse" s of
                Left _  -> Nothing
                Right e -> Just e
 
--- | This is an internal datatype used for finding the sections rapidly based
---   on the class name.
-type Catalog = Map.Map ClassName [Section]
-
-{-
 buildCatalog :: [Section] -> Catalog
 buildCatalog sects = Map.fromListWith (++) [ (classOf sec, [sec]) | sec <- sects ]
     where
-      classOf (Section { sectionOf = c, .. }) = Class (department c) (course
-      c)
--}
+      classOf (Section { sectionOf = c, .. }) = Class (department c) (course c)
