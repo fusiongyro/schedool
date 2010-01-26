@@ -104,5 +104,7 @@ readSections :: FilePath -> IO [Section]
 readSections f = readFile f >>= return . parseSections
 
 -- testing crap
+{-
 rowN :: Int -> IO [Tag String]
 rowN n = readFile "cs.html" >>= return . head . drop n . breakRows . parseTags
+-}
