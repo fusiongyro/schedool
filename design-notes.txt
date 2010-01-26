@@ -75,7 +75,7 @@ Module structure
            will be very simple.
 
 	   Exports:
-	     runQuery  :: [Section] -> String -> [Section]
+	     runQuery  :: [Section] -> String -> [[Section]]
 
 
 Query language
