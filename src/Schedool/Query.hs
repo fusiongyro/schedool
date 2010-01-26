@@ -30,7 +30,12 @@ data Expr = Expr `OrExp` Expr
 type Catalog = Map.Map ClassName [Section]
 
 runQuery  :: [Section] -> String -> [[Section]]
-runQuery = undefined
+runQuery sects q = execQuery (buildCatalog sects) q
+
+execQuery :: Catalog -> String -> [[Section]]
+execQuery cat q = case runParse q of
+                    Just expr -> evaluate cat expr
+                    Nothing -> []
 
 lexer = P.makeTokenParser
         (emptyDef { identStart = letter
@@ -39,7 +44,7 @@ lexer = P.makeTokenParser
 
 space      = P.whiteSpace lexer
 ident      = P.identifier lexer
-classnum   = many1 (digit <|> oneOf "lL")
+classnum   = many1 alphaNum
 reservedOp = P.reservedOp lexer
 parens     = P.parens lexer
 
@@ -49,6 +54,7 @@ parseClass :: CharParser st Expr
 parseClass = do
   dept <- ident
   num  <- classnum
+  spaces
   return $ Value $ Class (upcase dept) (upcase num)
       where
         upcase = map Char.toUpper
@@ -81,7 +87,26 @@ runParse s = case parse exprParser "runParse" s of
                Left _  -> Nothing
                Right e -> Just e
 
+-- | This generates the catalog we need to perform the lookup.
 buildCatalog :: [Section] -> Catalog
 buildCatalog sects = Map.fromListWith (++) [ (classOf sec, [sec]) | sec <- sects ]
     where
       classOf (Section { sectionOf = c, .. }) = Class (department c) (course c)
+
+evaluate :: Catalog -> Expr -> [[Section]]
+evaluate cat (Value c)          = [ [x] | x <- Map.findWithDefault [] c cat]
+evaluate cat (e1 `AndExp` e2)   = [ i ++ j | i <- evaluate cat e1, j <- evaluate cat e2]
+evaluate cat (e1 `OrExp` e2)    = evaluate cat e1 ++ evaluate cat e2
+evaluate cat (e1 `AndOrExp` e2) = evaluate cat (e1 `AndExp` e2) ++ evaluate cat (e1 `OrExp` e2)
+
+showSect :: Section -> String
+showSect s = (department (sectionOf s)) ++ " " ++ (course (sectionOf s)) ++ "-" ++ (show (section s))
+
+showResults = map (map showSect)
+
+cat = getSections >>= return . buildCatalog
+
+(Just c1) = runParse "cse 113"
+(Just c2) = runParse "phys 122"
+
+-- showResults $ filter Schedool.Overlap.noOverlaps $ query "cse 113 and phys122 and span 589 or span 385"
