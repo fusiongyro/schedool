@@ -1,8 +1,11 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Schedool.Query (runQuery) where
+module Schedool.Query (runQuery
+                      ,getQueryContext
+                      ,executeQuery) where
 
 import Schedool.Data
+import Schedool.Overlap
 import Schedool.Section
 
 import Char
@@ -32,10 +35,13 @@ type Catalog = Map.Map ClassName [Section]
 runQuery  :: [Section] -> String -> [[Section]]
 runQuery sects q = execQuery (buildCatalog sects) q
 
-execQuery :: Catalog -> String -> [[Section]]
-execQuery cat q = case runParse q of
-                    Just expr -> evaluate cat expr
-                    Nothing -> []
+getQueryContext :: IO Catalog
+getQueryContext = getSections >>= return . buildCatalog
+
+executeQuery :: Catalog -> String -> [[Section]]
+executeQuery cat q = case runParse q of
+                       Just expr -> winnow $ evaluate cat expr
+                       Nothing   -> []
 
 lexer = P.makeTokenParser
         (emptyDef { identStart = letter
@@ -98,6 +104,9 @@ evaluate cat (Value c)          = [ [x] | x <- Map.findWithDefault [] c cat]
 evaluate cat (e1 `AndExp` e2)   = [ i ++ j | i <- evaluate cat e1, j <- evaluate cat e2]
 evaluate cat (e1 `OrExp` e2)    = evaluate cat e1 ++ evaluate cat e2
 evaluate cat (e1 `AndOrExp` e2) = evaluate cat (e1 `AndExp` e2) ++ evaluate cat (e1 `OrExp` e2)
+
+winnow :: [[Section]] -> [[Section]]
+winnow = filter noOverlaps
 
 showSect :: Section -> String
 showSect s = (department (sectionOf s)) ++ " " ++ (course (sectionOf s)) ++ "-" ++ (show (section s))
