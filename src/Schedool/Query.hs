@@ -32,8 +32,10 @@ data Expr = Expr `OrExp` Expr
 --   on the class name.
 type Catalog = Map.Map ClassName [Section]
 
-runQuery  :: [Section] -> String -> [[Section]]
-runQuery sects q = execQuery (buildCatalog sects) q
+runQuery  :: String -> IO [[Section]]
+runQuery q = do
+  cat <- getQueryContext
+  return $ executeQuery cat q
 
 getQueryContext :: IO Catalog
 getQueryContext = getSections >>= return . buildCatalog
