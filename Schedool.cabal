@@ -1,17 +1,19 @@
-Name: Schedmaster
+Name: Schedool
+Description: A set of utilities for finding class schedules without conflicting times.
 Version: 0.0.0
 Cabal-Version: >=1.2
 Build-Type: Simple
 License: BSD3
 License-File: LICENSE.txt
 Copyright:
-Maintainer:
+Maintainer: Daniel Lyons <fusion@storytotell.org>
+Category: Education
 Synopsis: A tool for downloading and creating non-conflicting class schedules.
 Author: Daniel Lyons
 
-Library
+Executable schedql
   Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
-                 regex-posix -any, tagsoup -any
-  Exposed-Modules: Schedool.Time, Schedool.Section, Schedool.Parse, 
-                   Schedool.Fetch, Schedool.Schedule
+                 regex-posix -any, tagsoup -any, parsec -any, containers -any,
+                 filepath -any, directory -any
   Hs-Source-Dirs: src
+  Main-Is: SchedQL/Main.hs

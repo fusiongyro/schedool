@@ -2,7 +2,10 @@
 
 module Schedool.Query (runQuery
                       ,getQueryContext
-                      ,executeQuery) where
+                      ,executeQuery
+                      ,Catalog
+                      ,showResults,
+                      module Schedool.Section) where
 
 import Schedool.Data
 import Schedool.Overlap
