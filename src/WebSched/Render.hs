@@ -23,13 +23,13 @@
 --   example or purely with Text.XHtml. You can then use the 'renderM'
 --   function to convert layouts to actual HTML text.
 module WebSched.Render (CSS
-              ,JavaScript
-              ,module Text.XHtml.Strict
-              ,addCSS
-              ,addJavaScript
-              ,addHtml
-              ,renderM
-              ,layout)
+                       ,JavaScript
+                       ,module Text.XHtml.Strict
+                       ,addCSS
+                       ,addJavaScript
+                       ,addHtml
+                       ,renderM
+                       ,layout)
     where
 
 import Control.Monad.Writer

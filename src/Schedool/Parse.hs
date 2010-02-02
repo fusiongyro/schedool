@@ -64,8 +64,8 @@ breakRows = partitions (~== "<TR>")
 
 parseCourseInfo :: Array Int String -> Maybe (String, String, Integer)
 parseCourseInfo a = case (a ! 1) =~ "([^ ]+) ([0-9]+)-([0-9]+)" :: (String, String, String, [String]) of
-			 (_, _, _, [dept, course, sect1]) -> Just (dept, course, read sect1)
-			 _ -> Nothing
+                         (_, _, _, [dept, course, sect1]) -> Just (dept, course, read sect1)
+                         _ -> Nothing
 
 parseClassInfo :: Array Int String -> (String, String, Integer) -> Maybe ClassInfo
 parseClassInfo a (dept, course, sect) = Just (ClassInfo dept course credits)
