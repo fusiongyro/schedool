@@ -37,14 +37,14 @@ parseWeekdays :: String -> [Weekday]
 parseWeekdays = catMaybes . map charToWeekday
 
 parseInterval :: String -> Maybe (Time, Time)
-parseInterval s = case (map read (s =~ "([0-9][0-9])")) of
+parseInterval s = case (map (read . head) (s =~ "([0-9][0-9])")) of
                     [h1, m1, h2, m2] -> Just ((h1, m1), (h2, m2))
                     _                -> Nothing
 
 readInteger :: String -> Maybe Integer
 readInteger x = case x =~ "^[0-9]+$" of
-                 [s] -> Just $ read s
-                 _ -> Nothing
+                 [[s]] -> Just $ read s
+                 _     -> Nothing
 
 strip :: String -> String
 strip = unwords . words
