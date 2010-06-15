@@ -1,6 +1,6 @@
 Name: Schedool
 Description: A set of utilities for finding class schedules without conflicting times.
-Version: 0.0.0
+Version: 0.0.1
 Cabal-Version: >=1.2
 Build-Type: Simple
 License: BSD3
@@ -12,7 +12,7 @@ Synopsis: A tool for downloading and creating non-conflicting class schedules.
 Author: Daniel Lyons
 
 Executable schedql
-  Build-Depends: HTTP -any, base -any, haskell98 -any, network -any,
+  Build-Depends: HTTP -any, base >= 4, haskell98 -any, network -any,
                  regex-posix -any, tagsoup -any, parsec -any, containers -any,
                  filepath -any, directory -any
   Hs-Source-Dirs: src
