@@ -42,11 +42,23 @@ fetchDepartments = fetch departmentsUri
 courseUri :: String
 courseUri = "https://banweb7.nmt.edu/pls/PROD/hwzkcrof.P_UncgSrchCrsOff"
 
+type Year = Integer
+data Season = Summer | Fall | Spring
+data Term = Term Season Year
+
+encodeTerm :: Term -> String
+encodeTerm (Term Spring y) = show y ++ "30"
+encodeTerm (Term Summer y) = show (y + 1) ++ "10"
+encodeTerm (Term Fall y) = show (y + 1) ++ "20"
+
 makeDeptRequest :: Department -> Request_String
-makeDeptRequest (Dept _ code) =
+makeDeptRequest = makeTermDeptRequest (Term Fall 2010)
+
+makeTermDeptRequest :: Term -> Department -> Request_String
+makeTermDeptRequest term (Dept _ code) =
     formToRequest $ Form POST (fromJust $ parseURI courseUri)
     -- FIXME: bad hardcoded constant! look this up in the submitted form
-                      [("p_term", "201030"), ("p_subj", code)]
+                      [("p_term", encodeTerm term), ("p_subj", code)]
 
 deptToFilename :: Department -> String
 deptToFilename (Dept _ code) = (map toLower code) ++ ".html"
