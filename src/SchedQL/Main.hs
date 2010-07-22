@@ -10,9 +10,7 @@ import Schedool.Time
 import Schedool.Query
 
 queryInteractively :: IO ()
-queryInteractively = do
-  ctx <- getQueryContext
-  forever $ oneQuery ctx
+queryInteractively = getQueryContext >>= forever . oneQuery
 
 oneQuery :: Catalog -> IO ()
 oneQuery cat = do
