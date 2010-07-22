@@ -7,6 +7,7 @@ import Schedool.Mirror
 import Schedool.Parse
 import Schedool.Section
 
+import Control.Applicative
 import Control.Monad
 
 -- | The current list of departments. Uses two levels of caching.
@@ -23,15 +24,7 @@ getSections = tryCache "sections.hs" readSections
 
 -- | The current list of Sections.
 readSections :: IO [Section]
-readSections = do
-  -- get all the departments
-  depts <- readDepartments
-  -- get each department's sections and concatenate all of them into one big list
-  liftM concat $ forM depts readSection
+readSections = readDepartments >>= (\x -> concat <$> mapM readSection x)
 
 readSection :: Department -> IO [Section]
-readSection dept = do
-  -- read the section HTML
-  sectionHTML <- openSectionData dept
-  -- pass it off to the parser
-  return $ parseSections sectionHTML
+readSection dept = parseSections <$> openSectionData dept
