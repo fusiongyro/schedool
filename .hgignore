@@ -1,3 +1,5 @@
 dist/
 src/cache/
 doc/
+cache/
+cache-aside/
