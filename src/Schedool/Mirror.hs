@@ -9,16 +9,13 @@ module Schedool.Mirror (openDepartmentData
 import Schedool.Cache
 import Schedool.Section
       
-import Char
+import Data.Char
 
 import Data.Maybe
 
 import Network.Browser
 import Network.HTTP
 import Network.URI
-
-import System.Directory
-import System.FilePath
 
 departmentsCache :: String
 departmentsCache = "departments.html"
@@ -61,10 +58,10 @@ makeTermDeptRequest term (Dept _ code) =
                       [("p_term", encodeTerm term), ("p_subj", code)]
 
 deptToFilename :: Department -> String
-deptToFilename (Dept _ code) = (map toLower code) ++ ".html"
+deptToFilename (Dept _ code) = map toLower code ++ ".html"
 
 fetchDepartment :: Department -> IO String
-fetchDepartment dept@(Dept name code) = do
+fetchDepartment dept = do
   -- send the request
   res <- simpleHTTP $ makeDeptRequest dept
   -- get the response body
