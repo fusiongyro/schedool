@@ -1,6 +1,8 @@
 module Schedool.Cache (tryCache)
     where
 
+import Control.Applicative ((<$>))
+
 import System.Directory
 import System.FilePath
 
@@ -19,7 +21,7 @@ tryCache key recalc = do
   exists <- doesFileExist filePath
   -- if it exists, return that content
   if exists
-     then readFile filePath >>= return . read
+     then read <$> readFile filePath
      else do
            -- since it doesn't, we execute the IO action and cache that
            content <- recalc
