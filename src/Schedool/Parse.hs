@@ -26,10 +26,8 @@ parseDepts (TagClose "SELECT" : _) = []
 parseDepts (_ : xs) = parseDepts xs
 parseDepts [] = []
 
-(!?) :: (Ix ix) => Array ix v -> ix -> Maybe v
-arr !? i = if i > min' && i < max' then Just (arr ! i) else Nothing
-    where
-      (min', max') = bounds arr
+(!?) ∷ (Ix ix) ⇒ Array ix v → ix → Maybe v
+arr !? i = guard (bounds arr `inRange` i) >> return (arr ! i)
 
 parseWeekdays :: String -> [Weekday]
 parseWeekdays = mapMaybe charToWeekday
