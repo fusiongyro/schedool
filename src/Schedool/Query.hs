@@ -13,12 +13,8 @@ import Schedool.Data
 import Schedool.Overlap
 import Schedool.Section
 
-<<<<<<< mine
-import Data.Char
-=======
 import Control.Applicative ((<$>))
 import Data.Char
->>>>>>> theirs
 import qualified Data.Map as Map
 import Data.Maybe
 
