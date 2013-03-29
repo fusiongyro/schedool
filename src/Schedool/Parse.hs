@@ -6,12 +6,8 @@ import Schedool.Section
 import Schedool.Time
 import Schedool.Utility (strNormal)
 
-<<<<<<< mine
 import Data.Array
 import Control.Exception
-=======
-import Array
->>>>>>> theirs
 import Control.Monad
 import Data.Maybe
 import Text.HTML.TagSoup
