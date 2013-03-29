@@ -11,8 +11,9 @@ import Schedool.Data
 import Schedool.Overlap
 import Schedool.Section
 
-import Char
+import Data.Char
 import qualified Data.Map as Map
+import Data.Maybe
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Char
@@ -68,7 +69,7 @@ parseClass = do
   spaces
   return $ Value $ Class (upcase dept) (upcase num)
       where
-        upcase = map Char.toUpper
+        upcase = map toUpper
 
 term = parseClass <|> (parens exprParser <?> "class")
 

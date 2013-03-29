@@ -1,12 +1,12 @@
 module Schedool.Parse (parseDepartments
-                       ,parseSections)
+                      ,parseSections)
     where
 
 import Schedool.Section
 import Schedool.Time
 import Schedool.Utility (strNormal)
 
-import Array
+import Data.Array
 import Control.Exception
 import Control.Monad
 import Data.Maybe

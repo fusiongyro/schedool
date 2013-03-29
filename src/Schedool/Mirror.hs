@@ -9,7 +9,7 @@ module Schedool.Mirror (openDepartmentData
 import Schedool.Cache
 import Schedool.Section
       
-import Char
+import Data.Char
 
 import Data.Maybe
 
@@ -52,7 +52,7 @@ encodeTerm (Term Summer y) = show (y + 1) ++ "10"
 encodeTerm (Term Fall y) = show (y + 1) ++ "20"
 
 makeDeptRequest :: Department -> Request_String
-makeDeptRequest = makeTermDeptRequest (Term Fall 2010)
+makeDeptRequest = makeTermDeptRequest (Term Spring 2012)
 
 makeTermDeptRequest :: Term -> Department -> Request_String
 makeTermDeptRequest term (Dept _ code) =
