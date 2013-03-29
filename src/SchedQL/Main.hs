@@ -30,14 +30,14 @@ displayResults = mapM_ displayResult
         putStrLn ""
                  
       displaySection :: Section -> IO ()
-      displaySection s = printf "%-4s %s-%d (%d) from %d:%02d--%d:%02d %s at %s\n" dept course section crn hour min stopHour stopMin on at
+      displaySection s = printf "%-4s %s-%d (%d) from %d:%02d--%d:%02d %s at %s (%s)\n" dept course section crn hour min stopHour stopMin on at instructor
           where
             (Section
              { section   = section,
                crn = crn,
                sectionOf = (ClassInfo { department = dept, course = course}),
                location  = (LocationInfo { campus = campus, room = at }),
-               schedule  = (ScheduleInfo { days = days, start = (hour, min), stop = (stopHour, stopMin) }), .. }) = s
+               schedule  = (ScheduleInfo { days = days, start = (hour, min), stop = (stopHour, stopMin) }), instructor = Just instructor }) = s
             on      = map weekdayToChar days
 
 main :: IO ()
