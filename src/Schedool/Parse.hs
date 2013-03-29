@@ -1,19 +1,20 @@
 module Schedool.Parse (parseDepartments
-                       ,parseSections)
+                      ,parseSections)
     where
 
 import Schedool.Section
 import Schedool.Time
 import Schedool.Utility (strNormal)
 
-import Array
+import Data.Array
+import Control.Exception
 import Control.Monad
 import Data.Maybe
 import Text.HTML.TagSoup
 import Text.Regex.Posix
 
 parseDepartments :: String -> [Department]
-parseDepartments = parseDepts . head . sections (~== "<SELECT NAME=p_subj>") . parseTags
+parseDepartments = parseDepts . (!! 1) . sections (~== "<SELECT>") . parseTags
 
 parseSections :: String -> [Section]
 parseSections s = mapMaybe parseRow $ breakRows $ parseTags s
@@ -60,7 +61,7 @@ breakRows = partitions (~== "<TR>")
 
 parseCourseInfo :: Array Int String -> Maybe (String, String, Integer)
 parseCourseInfo a = case concat $ (a ! 1) =~ "([^ ]+) ([0-9]+)-([0-9]+)" of
-                         [dept, c, sect1] -> Just (dept, c, read sect1)
+                         [_, dept, c, sect1] -> Just (dept, c, read sect1)
                          _ -> Nothing
 
 parseClassInfo :: Array Int String -> (String, String, Integer) -> Maybe ClassInfo

@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module Schedool.Section (Section(..)
                         ,ClassInfo(..)
                         ,LocationInfo(..)
@@ -13,6 +14,7 @@ module Schedool.Section (Section(..)
 import Schedool.Overlap
 import Schedool.Time hiding (toInterval)
 
+import Data.Data
 import Data.Function
 
 -- | The class you register for is actually a section, that is, an instance of
@@ -26,7 +28,7 @@ data Section = Section {
     schedule    :: ScheduleInfo,
     instructor  :: Maybe String,
     enrolled    :: Maybe Integer }
-    deriving (Show, Eq, Read)
+    deriving (Show, Eq, Read, Data, Typeable)
 
 -- | The class info is the platonic ideal of the class; the material, the
 --   department it belongs to and how many credit hours it is. If we had more
@@ -35,7 +37,7 @@ data ClassInfo = ClassInfo {
     department  :: String,
     course      :: String,
     credits     :: Integer }
-    deriving (Show, Eq, Read)
+    deriving (Show, Eq, Read, Data, Typeable)
 
 -- | Represents the campus, the room and the number this room can seat (a
 --   minor violation of normalization, due to the nature of our data format).
@@ -43,7 +45,7 @@ data LocationInfo = LocationInfo {
     campus      :: String,
     room        :: String,
     limit       :: Maybe Integer }
-    deriving (Show, Eq, Read)
+    deriving (Show, Eq, Read, Data, Typeable)
 
 -- | The calendar data which interests me about this particular class: when it
 --   meets on which days. Note that this data structure implicitly prevents us
@@ -54,7 +56,7 @@ data ScheduleInfo = ScheduleInfo {
     days        :: [Weekday],
     start       :: Time,
     stop        :: Time }
-    deriving (Show, Eq, Read)
+    deriving (Show, Eq, Read, Data, Typeable)
 
 type Name = String
 type Code = String
@@ -62,7 +64,7 @@ type Code = String
 -- | The department is broken down into the conjunction of its name and the
 --   code which represents it in Banweb or the catalog.
 data Department = Dept Name Code
-                  deriving (Show, Eq, Read)
+                  deriving (Show, Eq, Read, Data, Typeable)
 
 -- | Converts our ScheduleInfo into a list of intervals. Note that the result
 --   can be passed directly to 'Overlap.overlaps'.

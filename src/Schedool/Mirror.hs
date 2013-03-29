@@ -27,7 +27,7 @@ openDepartmentData = tryCache departmentsCache fetchDepartments
 
 -- | This is the URI for the departments list dropdown.
 departmentsUri :: String
-departmentsUri = "https://banweb7.nmt.edu/pls/PROD/hwzkcrof.p_uncgslctcrsoff"
+departmentsUri = "http://banweb7.nmt.edu/pls/PROD/hwzkcrof.p_uncgslctcrsoff"
 
 -- | Simple wrapper to get the content at a particular URL
 fetch :: String -> IO String
@@ -37,7 +37,7 @@ fetchDepartments :: IO String
 fetchDepartments = fetch departmentsUri
 
 courseUri :: String
-courseUri = "https://banweb7.nmt.edu/pls/PROD/hwzkcrof.P_UncgSrchCrsOff"
+courseUri = "http://banweb7.nmt.edu/pls/PROD/hwzkcrof.P_UncgSrchCrsOff"
 
 type Year = Integer
 data Season = Summer | Fall | Spring
@@ -49,7 +49,7 @@ encodeTerm (Term Summer y) = show (y + 1) ++ "10"
 encodeTerm (Term Fall y) = show (y + 1) ++ "20"
 
 makeDeptRequest :: Department -> Request_String
-makeDeptRequest = makeTermDeptRequest (Term Fall 2010)
+makeDeptRequest = makeTermDeptRequest (Term Spring 2012)
 
 makeTermDeptRequest :: Term -> Department -> Request_String
 makeTermDeptRequest term (Dept _ code) =
