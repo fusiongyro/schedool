@@ -1,9 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE RankNTypes #-}
 
-
-module Schedool.Query (runQuery
-                      ,getQueryContext
+module Schedool.Query ( runQuery
+					,getQueryContext
                       ,executeQuery
                       ,Catalog
                       ,showResults,
@@ -16,6 +15,7 @@ import Schedool.Section
 import Control.Applicative ((<$>))
 import Data.Char
 import qualified Data.Map as Map
+import Data.Maybe
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Expr

@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances, DeriveDataTypeable #-}
 
 -- | Time and date related types and functions.
 module Schedool.Time (Hour
@@ -11,6 +11,7 @@ module Schedool.Time (Hour
                      ,weekdayToChar)
     where
 
+import Data.Data
 import Schedool.Overlap
 
 -- | An hour is simply an integer.
@@ -26,7 +27,7 @@ data Weekday  = Monday
               | Friday
               | Saturday
               | Sunday
-                deriving (Show, Eq, Ord, Read)
+                deriving (Show, Eq, Ord, Read, Data, Typeable)
 
 -- | This and its opposite 'weekdayToChar' are convenient for the shorthand
 --   notation used in Banweb.
