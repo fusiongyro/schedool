@@ -1,0 +1,19 @@
+Name: Schedool
+Description: A set of utilities for finding class schedules without conflicting times.
+Version: 0.0.1
+Cabal-Version: >=1.2
+Build-Type: Simple
+License: BSD3
+License-File: LICENSE.txt
+Copyright:
+Maintainer: Daniel Lyons <fusion@storytotell.org>
+Category: Education
+Synopsis: A tool for downloading and creating non-conflicting class schedules.
+Author: Daniel Lyons
+
+Executable schedql
+  Build-Depends: HTTP, base >= 4 && < 5, array >= 0.4.0.0, network,
+                 regex-posix, tagsoup, parsec, containers,
+                 filepath, directory
+  Hs-Source-Dirs: src
+  Main-Is: SchedQL/Main.hs
