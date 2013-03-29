@@ -1,6 +1,6 @@
 {-# LANGUAGE ViewPatterns #-}
 
-module SchedRest.Main where
+module Main where
 
 import Schedool.Query
 
