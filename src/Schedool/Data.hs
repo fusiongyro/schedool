@@ -8,7 +8,6 @@ import Schedool.Parse
 import Schedool.Section
 
 import Control.Applicative
-import Control.Monad
 
 -- | The current list of departments. Uses two levels of caching.
 getDepartments :: IO [Department]
@@ -16,7 +15,7 @@ getDepartments = tryCache "departments.hs" readDepartments
 
 -- | The current list of Departments.
 readDepartments :: IO [Department]
-readDepartments = openDepartmentData >>= return . parseDepartments
+readDepartments = parseDepartments <$> openDepartmentData
 
 -- | The curretn list of sections. Uses two levels of caching.
 getSections :: IO [Section]

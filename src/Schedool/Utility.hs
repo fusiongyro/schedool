@@ -9,7 +9,7 @@ combinations :: [a] -> [(a, a)]
 combinations []     = []
 combinations (x:xs) = distribute x xs ++ combinations xs
     where
-      distribute x (y:ys) = (x,y) : distribute x ys
+      distribute x' (y:ys) = (x',y) : distribute x' ys
       distribute _ []     = []
 
 -- | Removes leading and trailing whitespace as well as runs of spaces >

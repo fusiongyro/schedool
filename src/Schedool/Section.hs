@@ -13,6 +13,8 @@ module Schedool.Section (Section(..)
 import Schedool.Overlap
 import Schedool.Time hiding (toInterval)
 
+import Data.Function
+
 -- | The class you register for is actually a section, that is, an instance of
 --   a particular course being taught at a particular time and place by a
 --   particular professor, with so many students enrolled.
@@ -65,22 +67,22 @@ data Department = Dept Name Code
 -- | Converts our ScheduleInfo into a list of intervals. Note that the result
 --   can be passed directly to 'Overlap.overlaps'.
 toInterval :: ScheduleInfo -> [Interval]
-toInterval (ScheduleInfo days start stop) = map (\x -> (start,stop,x)) days
+toInterval (ScheduleInfo d start' stop') = map (\x -> (start',stop',x)) d
 
 -- | ScheduleInfo is itself overlappable.
 instance Overlappable ScheduleInfo where
-  s1 `overlaps` s2 = (toInterval s1) `overlaps` (toInterval s2)
+  overlaps = overlaps `on` toInterval
 
 -- | Section is itself overlappable, as it aggregates ScheduleInfo.
 instance Overlappable Section where
-  s1 `overlaps` s2 = (schedule s1) `overlaps` (schedule s2)
+  overlaps = overlaps `on` schedule
 
 -- | A handy display routine used to much objection in modules that must
 --   format data.
 pshow :: Section -> String
-pshow s = showClassInfo (sectionOf s) ++ " (" ++ (showSchedInfo (schedule s)) ++ ")"
+pshow s = classInfo (sectionOf s) ++ " (" ++ showSchedInfo (schedule s) ++ ")"
     where
-      showClassInfo (ClassInfo dept course _) = dept ++ " " ++ course ++ "-" ++ (show (section s))
-      showSchedInfo (ScheduleInfo days start stop)   = (showT start) ++ "-" ++ (showT stop) ++ " " ++ (weekdays days)
+      classInfo (ClassInfo d c _) = d ++ " " ++ c ++ "-" ++ show (section s)
+      showSchedInfo (ScheduleInfo d b e)   = showT b ++ "-" ++ showT e ++ " " ++ weekdays d
       weekdays = map weekdayToChar
-      showT (hour,minute)     = (show hour) ++ ":" ++ (show minute)
+      showT (h,m)     = show h ++ ":" ++ show m
