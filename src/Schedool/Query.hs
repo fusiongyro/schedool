@@ -1,4 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RankNTypes #-}
+
 
 module Schedool.Query (runQuery
                       ,getQueryContext
@@ -11,12 +13,16 @@ import Schedool.Data
 import Schedool.Overlap
 import Schedool.Section
 
+<<<<<<< mine
 import Data.Char
+=======
+import Control.Applicative ((<$>))
+import Data.Char
+>>>>>>> theirs
 import qualified Data.Map as Map
 import Data.Maybe
 
 import Text.ParserCombinators.Parsec
-import Text.ParserCombinators.Parsec.Char
 import Text.ParserCombinators.Parsec.Expr
 import qualified Text.ParserCombinators.Parsec.Token as P
 import Text.ParserCombinators.Parsec.Language
@@ -42,22 +48,30 @@ runQuery q = do
   return $ executeQuery cat q
 
 getQueryContext :: IO Catalog
-getQueryContext = getSections >>= return . buildCatalog
+getQueryContext = buildCatalog <$> getSections
 
 executeQuery :: Catalog -> String -> [[Section]]
 executeQuery cat q = case runParse q of
                        Just expr -> winnow $ evaluate cat expr
                        Nothing   -> []
 
+lexer :: forall st. P.TokenParser st
 lexer = P.makeTokenParser
         (emptyDef { identStart = letter
                   , identLetter = letter
                   , reservedOpNames = ["and", ",", "or", "and/or"]})
 
-space      = P.whiteSpace lexer
+--space      = P.whiteSpace lexer
+ident :: forall st. CharParser st String
 ident      = P.identifier lexer
+
+classnum :: forall st. GenParser Char st String
 classnum   = many1 alphaNum
+
+reservedOp :: forall st. String -> CharParser st ()
 reservedOp = P.reservedOp lexer
+
+parens :: forall st a. CharParser st a -> CharParser st a
 parens     = P.parens lexer
 
 -- | Parses a string of the form "CS 121" and returns the
@@ -71,6 +85,7 @@ parseClass = do
       where
         upcase = map toUpper
 
+term :: forall st. GenParser Char st Expr
 term = parseClass <|> (parens exprParser <?> "class")
 
 -- | The operator precedence expression table for our language.
@@ -86,12 +101,12 @@ exprParser = buildExpressionParser table term <?> "expression"
 
 
 -- | Produces all of the valid combinations of this expression, as a test of the parser.
-combinations :: Expr -> [[ClassName]]
-combinations (Value c)          = [[c]]
+--combinations :: Expr -> [[ClassName]]
+--combinations (Value c)          = [[c]]
                                   -- is this really right?
-combinations (e1 `AndExp` e2)   = [ i ++ j | i <- combinations e1, j <- combinations e2 ]
-combinations (e1 `OrExp` e2)    = combinations e1 ++ combinations e2
-combinations (e1 `AndOrExp` e2) = combinations (e1 `AndExp` e2) ++ combinations (e1 `OrExp` e2)
+--combinations (e1 `AndExp` e2)   = [ i ++ j | i <- combinations e1, j <- combinations e2 ]
+--combinations (e1 `OrExp` e2)    = combinations e1 ++ combinations e2
+--combinations (e1 `AndOrExp` e2) = combinations (e1 `AndExp` e2) ++ combinations (e1 `OrExp` e2)
 
 -- | A simple interface to the parser.
 runParse :: String -> Maybe Expr
@@ -115,13 +130,18 @@ winnow :: [[Section]] -> [[Section]]
 winnow = filter noOverlaps
 
 showSect :: Section -> String
-showSect s = (department (sectionOf s)) ++ " " ++ (course (sectionOf s)) ++ "-" ++ (show (section s))
+showSect s = department (sectionOf s) ++ " " ++ course (sectionOf s) ++ "-" ++ show (section s)
 
+showResults :: [[Section]] -> [[String]]
 showResults = map (map showSect)
 
-cat = getSections >>= return . buildCatalog
+{-
+
+cat = buildCatalog <$> getSections
 
 (Just c1) = runParse "cse 113"
 (Just c2) = runParse "phys 122"
 
 -- showResults $ filter Schedool.Overlap.noOverlaps $ query "cse 113 and phys122 and span 589 or span 385"
+
+-}
