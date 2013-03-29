@@ -1,9 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE RankNTypes #-}
 
-
-module Schedool.Query (runQuery
-                      ,getQueryContext
+module Schedool.Query ( runQuery
+					,getQueryContext
                       ,executeQuery
                       ,Catalog
                       ,showResults,
