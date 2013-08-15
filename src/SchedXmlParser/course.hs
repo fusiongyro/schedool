@@ -1,6 +1,7 @@
 module Main where
 
 import Control.Applicative
+import qualified Data.Map as M
 import Data.Maybe
 import Text.Read
 
@@ -113,6 +114,16 @@ parseDepartment elem = do
 
 parseDepartments :: Element -> [DepartmentDef]
 parseDepartments = parseSome "dept-def" parseDepartment
+
+parseDepartments' :: Element -> M.Map String String
+parseDepartments' elem = M.fromList items
+  where
+    elems = findElements (named "dept-def") elem
+    items = mapMaybe getDepartment elems
+    getDepartment e = do
+      let name = strContent e
+      code <- attrNamed "dept-code" e
+      return (code, name)
 
 parseSome :: String -> (Element -> Maybe a) -> Element -> [a]
 parseSome name parser doc = mapMaybe parser $ findChildren (named name) doc
