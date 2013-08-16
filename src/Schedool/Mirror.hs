@@ -2,8 +2,9 @@
 --   its data. Essentially provides two functions which provide access to the
 --   cached data (which will recreate it if necessary) and a function to
 --   manually force a recreation.
-module Schedool.Mirror (openDepartmentData
-                       ,openSectionData)
+module Schedool.Mirror ( openDepartmentData
+                       , openSectionData
+                       , fetch)
     where
 
 import Schedool.Cache
